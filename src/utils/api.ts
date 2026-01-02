@@ -1,15 +1,8 @@
 // API configuration
-// Auto-detect if on phone (non-localhost) or computer (localhost)
-const getApiUrl = () => {
-  const hostname = window.location.hostname;
-  if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    return 'http://localhost:3005/api';
-  }
-  // Use the same IP as the frontend for the API
-  return `http://${hostname}:3005/api`;
-};
-
-const API_URL = (import.meta as any).env?.VITE_API_URL || getApiUrl();
+const API_URL = import.meta.env.VITE_API_URL || 
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:3005/api'
+    : `http://${window.location.hostname}:3005/api`);
 
 // Helper function for API calls
 async function apiCall(endpoint: string, options: RequestInit = {}) {

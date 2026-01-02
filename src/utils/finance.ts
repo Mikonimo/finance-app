@@ -1,0 +1,71 @@
+import { format, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
+import { Transaction } from '../db/database';
+
+export function formatCurrency(amount: number): string {
+  return new Intl.NumberFormat('en-KE', {
+    style: 'currency',
+    currency: 'KES',
+  }).format(amount);
+}
+
+export function formatDate(date: Date): string {
+  return format(date, 'MMM dd, yyyy');
+}
+
+export function getMonthKey(date: Date): string {
+  return format(date, 'yyyy-MM');
+}
+
+export function filterTransactionsByMonth(
+  transactions: Transaction[],
+  month: Date
+): Transaction[] {
+  const start = startOfMonth(month);
+  const end = endOfMonth(month);
+
+  return transactions.filter((t) =>
+    isWithinInterval(t.date, { start, end })
+  );
+}
+
+export function calculateTotal(
+  transactions: Transaction[],
+  type?: 'income' | 'expense'
+): number {
+  return transactions
+    .filter((t) => !type || t.type === type)
+    .reduce((sum, t) => sum + t.amount, 0);
+}
+
+export function calculateAccountBalance(
+  transactions: Transaction[]
+): number {
+  return transactions.reduce((balance, t) => {
+    return t.type === 'income'
+      ? balance + t.amount
+      : balance - t.amount;
+  }, 0);
+}
+
+export function groupTransactionsByCategory(
+  transactions: Transaction[]
+): Record<number, number> {
+  return transactions.reduce((acc, t) => {
+    if (!acc[t.categoryId]) {
+      acc[t.categoryId] = 0;
+    }
+    acc[t.categoryId] += t.amount;
+    return acc;
+  }, {} as Record<number, number>);
+}
+
+export const ACCOUNT_COLORS = [
+  '#0ea5e9', '#8b5cf6', '#ec4899', '#f59e0b',
+  '#10b981', '#ef4444', '#6366f1', '#14b8a6'
+];
+
+export const CATEGORY_COLORS = [
+  '#ef4444', '#f59e0b', '#10b981', '#0ea5e9',
+  '#8b5cf6', '#ec4899', '#06b6d4', '#14b8a6',
+  '#f97316', '#84cc16', '#06b6d4', '#6366f1'
+];

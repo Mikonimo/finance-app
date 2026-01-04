@@ -42,6 +42,14 @@ export function initDatabase() {
     )
   `);
 
+  // Add parentCategoryId column if it doesn't exist (migration)
+  try {
+    db.exec(`ALTER TABLE categories ADD COLUMN parentCategoryId INTEGER`);
+    console.log('✅ Added parentCategoryId column to categories table');
+  } catch (error) {
+    // Column already exists, ignore error
+  }
+
   // Transactions table
   db.exec(`
     CREATE TABLE IF NOT EXISTS transactions (
@@ -63,6 +71,35 @@ export function initDatabase() {
       FOREIGN KEY (categoryId) REFERENCES categories(id)
     )
   `);
+
+  // Add missing columns to transactions if they don't exist (migrations)
+  try {
+    db.exec(`ALTER TABLE transactions ADD COLUMN toAccountId INTEGER`);
+    console.log('✅ Added toAccountId column to transactions table');
+  } catch (error) {
+    // Column already exists, ignore
+  }
+  
+  try {
+    db.exec(`ALTER TABLE transactions ADD COLUMN payee TEXT`);
+    console.log('✅ Added payee column to transactions table');
+  } catch (error) {
+    // Column already exists, ignore
+  }
+  
+  try {
+    db.exec(`ALTER TABLE transactions ADD COLUMN tags TEXT`);
+    console.log('✅ Added tags column to transactions table');
+  } catch (error) {
+    // Column already exists, ignore
+  }
+  
+  try {
+    db.exec(`ALTER TABLE transactions ADD COLUMN notes TEXT`);
+    console.log('✅ Added notes column to transactions table');
+  } catch (error) {
+    // Column already exists, ignore
+  }
 
   // Budgets table
   db.exec(`

@@ -15,12 +15,12 @@ export default function NetWorthView() {
   } | null>(null);
 
   const accounts = useLiveQuery(
-    () => db.accounts.filter(a => a.isActive === 1).toArray(),
+    () => db.accounts.filter(a => a.isActive).toArray(),
     []
   );
 
   const transactions = useLiveQuery(
-    () => db.transactions.filter(t => t.isActive !== 0).toArray(),
+    () => db.transactions.filter(t => t.isActive !== false).toArray(),
     []
   );
 

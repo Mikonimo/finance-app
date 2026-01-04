@@ -27,7 +27,7 @@ export default function TransactionsView() {
   const transactions = useLiveQuery(
     async () => {
       const all = await db.transactions.orderBy('date').reverse().toArray();
-      return all.filter(t => t.isActive !== 0); // Filter out deleted transactions (isActive === 0)
+      return all.filter(t => t.isActive !== false);
     },
     []
   );
@@ -68,8 +68,8 @@ export default function TransactionsView() {
   ).sort();
 
   const filteredTransactions = transactions.filter(t => {
-    // Only show active transactions (not deleted) - isActive is stored as integer (1/0)
-    if (t.isActive === 0) return false;
+    // Only show active transactions (not deleted)
+    if (t.isActive === false) return false;
 
     // Type filter
     if (filterType !== 'all' && t.type !== filterType) return false;

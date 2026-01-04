@@ -136,8 +136,8 @@ export default function SettingsView() {
     }
   };
 
-  const handleToggleRecurring = async (id: number, isActive: number) => {
-    await db.recurringTransactions.update(id, { isActive: isActive === 1 ? 0 : 1 });
+  const handleToggleRecurring = async (id: number, isActive: boolean) => {
+    await db.recurringTransactions.update(id, { isActive: !isActive });
   };
 
   const handleCloseRecurringModal = () => {

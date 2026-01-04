@@ -2,8 +2,8 @@ import { db, Account } from '../db/database';
 import { startOfDay } from 'date-fns';
 
 export const calculateNetWorth = async () => {
-  const accounts = await db.accounts.filter(a => a.isActive === 1).toArray();
-  const transactions = await db.transactions.filter(t => t.isActive !== 0).toArray();
+  const accounts = await db.accounts.filter(a => a.isActive).toArray();
+  const transactions = await db.transactions.filter(t => t.isActive !== false).toArray();
 
   let totalAssets = 0;
   let totalLiabilities = 0;

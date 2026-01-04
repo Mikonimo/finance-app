@@ -28,7 +28,7 @@ export default function RecurringTransactionForm({ recurringTransaction, onSucce
   );
 
   const categories = useLiveQuery(
-    () => db.categories.where('type').equals(formData.type).and(c => c.isActive === 1).toArray(),
+    () => db.categories.where('type').equals(formData.type).and(c => c.isActive).toArray(),
     [formData.type]
   );
 
@@ -61,7 +61,7 @@ export default function RecurringTransactionForm({ recurringTransaction, onSucce
       ...formData,
       startDate: new Date(formData.startDate),
       endDate: formData.endDate ? new Date(formData.endDate) : undefined,
-      isActive: 1, // Set as integer for consistency
+      isActive: true,
       createdAt: new Date(),
     };
 

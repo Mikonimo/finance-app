@@ -27,14 +27,14 @@ export default function SyncPanel() {
       const recurringTransactions = await db.recurringTransactions.toArray();
       const netWorthSnapshots = await db.netWorthSnapshots.toArray();
 
-      console.log('📤 Preparing to push:', JSON.stringify({
+      console.log('📤 Preparing to push:', {
         accounts: accounts.length,
         categories: categories.length,
         transactions: transactions.length,
         budgets: budgets.length,
         recurringTransactions: recurringTransactions.length,
         netWorthSnapshots: netWorthSnapshots.length,
-      }, null, 2));
+      });
 
       // Convert dates to ISO strings for API
       const formattedAccounts = accounts.map(acc => ({
@@ -47,8 +47,7 @@ export default function SyncPanel() {
         ...txn,
         date: txn.date ? new Date(txn.date).toISOString() : new Date().toISOString(),
         createdAt: txn.createdAt ? new Date(txn.createdAt).toISOString() : new Date().toISOString(),
-        isActive: txn.isActive !== 0 ? 1 : 0, // Ensure integer for SQLite (default to 1 if undefined)
-        tags: txn.tags ? JSON.stringify(txn.tags) : null, // Serialize array to JSON string for SQLite
+        isActive: txn.isActive !== false ? 1 : 0, // Convert boolean to integer for SQLite (default to 1 if undefined)
       }));
 
       const formattedRecurring = recurringTransactions.map(rec => ({
@@ -58,7 +57,6 @@ export default function SyncPanel() {
         lastProcessed: rec.lastProcessed ? new Date(rec.lastProcessed).toISOString() : new Date().toISOString(),
         createdAt: rec.createdAt ? new Date(rec.createdAt).toISOString() : new Date().toISOString(),
         isActive: rec.isActive ? 1 : 0, // Convert boolean to integer for SQLite
-        tags: rec.tags ? JSON.stringify(rec.tags) : null, // Serialize array to JSON string for SQLite
       }));
 
       const formattedSnapshots = netWorthSnapshots.map(snap => ({
@@ -94,16 +92,9 @@ export default function SyncPanel() {
       localStorage.setItem('lastSyncTime', timestamp);
       setLastSync(timestamp);
 
-      // Count only active items for display
-      const activeAccountsCount = accounts.filter(a => a.isActive).length;
-      const activeCategoriesCount = categories.filter(c => c.isActive).length;
-      const activeTransactionsCount = transactions.filter(t => t.isActive !== 0).length;
-      const activeRecurringCount = recurringTransactions.filter(r => r.isActive).length;
-      const totalActive = activeAccountsCount + activeCategoriesCount + activeTransactionsCount + budgets.length + activeRecurringCount + netWorthSnapshots.length;
-
       setSyncStatus({
         type: 'success',
-        message: `✅ Synced ${totalActive} active items (${result.inserted} new, ${result.updated} updated)${result.errors?.length ? `, ${result.errors.length} errors` : ''}`,
+        message: `✅ Pushed ${result.inserted} new, updated ${result.updated} items`,
       });
     } catch (error: any) {
       setSyncStatus({
@@ -161,7 +152,6 @@ export default function SyncPanel() {
           await db.accounts.put({
             ...account,
             createdAt: new Date(account.createdAt),
-            // Keep isActive as integer (0 or 1) for Dexie queries
           });
           imported++;
         }
@@ -170,10 +160,7 @@ export default function SyncPanel() {
       // Import categories
       if (serverData.categories && serverData.categories.length > 0) {
         for (const category of serverData.categories) {
-          await db.categories.put({
-            ...category,
-            // Keep isActive as integer (0 or 1) for Dexie queries
-          });
+          await db.categories.put(category);
           imported++;
         }
       }
@@ -185,8 +172,6 @@ export default function SyncPanel() {
             ...transaction,
             date: new Date(transaction.date),
             createdAt: new Date(transaction.createdAt),
-            tags: transaction.tags ? (typeof transaction.tags === 'string' ? JSON.parse(transaction.tags) : transaction.tags) : undefined,
-            // Keep isActive as integer (0 or 1) for consistency
           });
           imported++;
         }
@@ -209,8 +194,6 @@ export default function SyncPanel() {
             endDate: recurring.endDate ? new Date(recurring.endDate) : undefined,
             lastProcessed: new Date(recurring.lastProcessed),
             createdAt: new Date(recurring.createdAt),
-            tags: recurring.tags ? (typeof recurring.tags === 'string' ? JSON.parse(recurring.tags) : recurring.tags) : undefined,
-            // Keep isActive as integer (0 or 1) for Dexie queries
           });
           imported++;
         }
@@ -299,7 +282,6 @@ export default function SyncPanel() {
             ...transaction,
             date: new Date(transaction.date),
             createdAt: new Date(transaction.createdAt),
-            tags: transaction.tags ? (typeof transaction.tags === 'string' ? JSON.parse(transaction.tags) : transaction.tags) : undefined,
           });
           imported++;
         }
@@ -320,7 +302,6 @@ export default function SyncPanel() {
             endDate: recurring.endDate ? new Date(recurring.endDate) : undefined,
             lastProcessed: new Date(recurring.lastProcessed),
             createdAt: new Date(recurring.createdAt),
-            tags: recurring.tags ? (typeof recurring.tags === 'string' ? JSON.parse(recurring.tags) : recurring.tags) : undefined,
           });
           imported++;
         }
@@ -351,53 +332,6 @@ export default function SyncPanel() {
       setSyncStatus({
         type: 'error',
         message: `❌ Force pull failed: ${error.message}`,
-      });
-    } finally {
-      setSyncing(false);
-    }
-  };
-
-  // Cleanup old deleted records (older than 30 days)
-  const handleCleanupDeleted = async () => {
-    if (!confirm('This will permanently delete all records marked as deleted more than 30 days ago. Continue?')) {
-      return;
-    }
-
-    setSyncing(true);
-    setSyncStatus({ type: null, message: '' });
-
-    try {
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-      // Delete old inactive transactions
-      const oldInactiveTransactions = await db.transactions
-        .filter(t => t.isActive === 0 && t.createdAt < thirtyDaysAgo)
-        .toArray();
-      
-      for (const t of oldInactiveTransactions) {
-        await db.transactions.delete(t.id!);
-      }
-
-      // Delete old inactive accounts
-      const oldInactiveAccounts = await db.accounts
-        .filter(a => a.isActive === 0 && a.createdAt < thirtyDaysAgo)
-        .toArray();
-      
-      for (const a of oldInactiveAccounts) {
-        await db.accounts.delete(a.id!);
-      }
-
-      const totalCleaned = oldInactiveTransactions.length + oldInactiveAccounts.length;
-
-      setSyncStatus({
-        type: 'success',
-        message: `✅ Cleaned up ${totalCleaned} old deleted records`,
-      });
-    } catch (error: any) {
-      setSyncStatus({
-        type: 'error',
-        message: `❌ Cleanup failed: ${error.message}`,
       });
     } finally {
       setSyncing(false);
@@ -482,17 +416,6 @@ export default function SyncPanel() {
           <p><strong>Push:</strong> Upload your local data to server</p>
           <p><strong>Full Sync:</strong> Pull first, then push</p>
           <p><strong>Pull All:</strong> Force download ALL data (use if sync not working)</p>
-        </div>
-
-        {/* Data Cleanup */}
-        <div className="pt-3 border-t">
-          <button
-            onClick={handleCleanupDeleted}
-            disabled={syncing}
-            className="text-sm text-red-600 hover:text-red-700 disabled:opacity-50"
-          >
-            🗑️ Clean up old deleted records (30+ days)
-          </button>
         </div>
 
         {/* Server Status */}

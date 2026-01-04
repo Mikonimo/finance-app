@@ -32,7 +32,7 @@ export default function TransactionForm({ transaction, onClose }: TransactionFor
   );
 
   const categories = useLiveQuery(
-    () => db.categories.where('type').equals(formData.type).and(c => c.isActive === 1).toArray(),
+    () => db.categories.where('type').equals(formData.type).and(c => c.isActive).toArray(),
     [formData.type]
   );
 
@@ -138,7 +138,7 @@ export default function TransactionForm({ transaction, onClose }: TransactionFor
       ...formData,
       date: new Date(formData.date),
       createdAt: new Date(),
-      isActive: 1, // Set as integer for consistency
+      isActive: true, // Set as active by default
     };
 
     if (transaction?.id) {

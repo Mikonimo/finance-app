@@ -161,7 +161,7 @@ export default function SettingsView() {
   const renderCategory = (category: Category, isSubcategory = false) => (
     <div
       key={category.id}
-      className={`flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 ${
+      className={`flex items-center justify-between p-3 border dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 ${
         isSubcategory ? 'ml-12 border-l-4' : ''
       }`}
       style={isSubcategory ? { borderLeftColor: category.color } : undefined}
@@ -173,18 +173,18 @@ export default function SettingsView() {
         >
           {getCategoryIcon(category.icon) || category.name.charAt(0).toUpperCase()}
         </div>
-        <span className="font-medium">{category.name}</span>
+        <span className="font-medium dark:text-gray-200">{category.name}</span>
       </div>
       <div className="flex gap-2">
         <button
           onClick={() => handleEditCategory(category)}
-          className="p-2 text-gray-600 hover:text-primary-600 transition-colors"
+          className="p-2 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
         >
           <Edit2 className="w-4 h-4" />
         </button>
         <button
           onClick={() => handleDeleteCategory(category.id!)}
-          className="p-2 text-gray-600 hover:text-red-600 transition-colors"
+          className="p-2 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
         >
           <Trash2 className="w-4 h-4" />
         </button>
@@ -194,24 +194,24 @@ export default function SettingsView() {
 
   return (
     <div className="max-w-7xl mx-auto p-4 space-y-6">
-      <h2 className="text-2xl font-bold">Settings</h2>
+      <h2 className="text-2xl font-bold dark:text-white">Settings</h2>
 
       {/* Quick Access */}
-      <div className="bg-white rounded-lg shadow p-4">
-        <h3 className="text-lg font-semibold mb-3">Quick Access</h3>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+        <h3 className="text-lg font-semibold mb-3 dark:text-white">Quick Access</h3>
         <div className="grid grid-cols-2 gap-2">
           <button
             onClick={() => setCurrentView('reports')}
-            className="flex items-center gap-2 p-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            className="flex items-center gap-2 p-3 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors dark:text-gray-200"
           >
-            <BarChart3 className="w-5 h-5 text-primary-600" />
+            <BarChart3 className="w-5 h-5 text-primary-600 dark:text-primary-400" />
             <span className="font-medium">Reports</span>
           </button>
           <button
             onClick={() => setCurrentView('networth')}
-            className="flex items-center gap-2 p-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            className="flex items-center gap-2 p-3 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors dark:text-gray-200"
           >
-            <TrendingUp className="w-5 h-5 text-green-600" />
+            <TrendingUp className="w-5 h-5 text-green-600 dark:text-green-400" />
             <span className="font-medium">Net Worth</span>
           </button>
         </div>
@@ -221,12 +221,12 @@ export default function SettingsView() {
       <SyncPanel />
 
       {/* Recurring Transactions */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold">Recurring Transactions</h3>
+          <h3 className="text-lg font-semibold dark:text-white">Recurring Transactions</h3>
           <button
             onClick={() => setShowRecurringModal(true)}
-            className="flex items-center gap-2 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
+            className="flex items-center gap-2 bg-primary-600 dark:bg-primary-500 text-white px-4 py-2 rounded-lg hover:bg-primary-700 dark:hover:bg-primary-600 transition-colors"
           >
             <Plus className="w-5 h-5" />
             Add Recurring
@@ -234,7 +234,7 @@ export default function SettingsView() {
         </div>
 
         {recurringTransactions.length === 0 ? (
-          <p className="text-gray-500 text-center py-8">No recurring transactions yet</p>
+          <p className="text-gray-500 dark:text-gray-400 text-center py-8">No recurring transactions yet</p>
         ) : (
           <div className="space-y-2">
             {recurringTransactions.map((recurring) => {

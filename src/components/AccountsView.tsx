@@ -73,10 +73,10 @@ export default function AccountsView() {
   return (
     <div className="max-w-7xl mx-auto p-4 space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Accounts</h2>
+        <h2 className="text-2xl font-bold dark:text-white">Accounts</h2>
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
+          className="flex items-center gap-2 bg-primary-600 dark:bg-primary-500 text-white px-4 py-2 rounded-lg hover:bg-primary-700 dark:hover:bg-primary-600 transition-colors"
         >
           <Plus className="w-5 h-5" />
           Add Account
@@ -84,7 +84,7 @@ export default function AccountsView() {
       </div>
 
       {/* Total balance card */}
-      <div className="bg-gradient-to-br from-primary-600 to-primary-800 rounded-lg shadow-lg p-6 text-white">
+      <div className="bg-gradient-to-br from-primary-600 to-primary-800 dark:from-primary-700 dark:to-primary-900 rounded-lg shadow-lg p-6 text-white">
         <p className="text-sm opacity-90">Total Balance</p>
         <p className="text-4xl font-bold mt-2">{formatCurrency(totalBalance)}</p>
       </div>
@@ -94,7 +94,7 @@ export default function AccountsView() {
         {accountsWithBalances.map((account) => (
           <div
             key={account.id}
-            className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow"
+            className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hover:shadow-lg transition-shadow"
           >
             <div className="flex justify-between items-start mb-4">
               <div className="flex items-center gap-3">
@@ -105,28 +105,28 @@ export default function AccountsView() {
                   {account.name.charAt(0).toUpperCase()}
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg">{account.name}</h3>
-                  <p className="text-sm text-gray-600 capitalize">{account.type}</p>
+                  <h3 className="font-semibold text-lg dark:text-white">{account.name}</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 capitalize">{account.type}</p>
                 </div>
               </div>
               <div className="flex gap-2">
                 <button
                   onClick={() => handleEdit(account)}
-                  className="text-gray-600 hover:text-primary-600 transition-colors"
+                  className="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
                 >
                   <Edit2 className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => handleDelete(account.id!)}
-                  className="text-gray-600 hover:text-red-600 transition-colors"
+                  className="text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
             </div>
 
-            <div className="pt-4 border-t">
-              <p className="text-2xl font-bold">{formatCurrency(account.balance)}</p>
+            <div className="pt-4 border-t dark:border-gray-700">
+              <p className="text-2xl font-bold dark:text-white">{formatCurrency(account.balance)}</p>
             </div>
           </div>
         ))}
@@ -134,10 +134,10 @@ export default function AccountsView() {
 
       {accounts.length === 0 && (
         <div className="text-center py-12">
-          <p className="text-gray-500 mb-4">No accounts yet</p>
+          <p className="text-gray-500 dark:text-gray-400 mb-4">No accounts yet</p>
           <button
             onClick={() => setShowModal(true)}
-            className="text-primary-600 hover:text-primary-700 font-medium"
+            className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
           >
             Create your first account
           </button>

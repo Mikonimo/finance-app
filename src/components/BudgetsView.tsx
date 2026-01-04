@@ -57,23 +57,23 @@ export default function BudgetsView() {
 
   return (
     <div className="max-w-7xl mx-auto p-4 space-y-6">
-      <h2 className="text-2xl font-bold">Budgets</h2>
+      <h2 className="text-2xl font-bold dark:text-white">Budgets</h2>
 
       {/* Month selector */}
-      <div className="bg-white rounded-lg shadow p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
         <div className="flex items-center justify-between">
           <button
             onClick={() => setSelectedMonth(subMonths(selectedMonth, 1))}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors dark:text-gray-200"
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
-          <h3 className="text-xl font-semibold">
+          <h3 className="text-xl font-semibold dark:text-white">
             {format(selectedMonth, 'MMMM yyyy')}
           </h3>
           <button
             onClick={() => setSelectedMonth(addMonths(selectedMonth, 1))}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors dark:text-gray-200"
           >
             <ChevronRight className="w-6 h-6" />
           </button>
@@ -81,23 +81,23 @@ export default function BudgetsView() {
       </div>
 
       {/* Overall progress */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <div className="flex justify-between items-center mb-4">
           <div>
-            <p className="text-sm text-gray-600">Total Budget</p>
-            <p className="text-2xl font-bold">{formatCurrency(totalBudget)}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Total Budget</p>
+            <p className="text-2xl font-bold dark:text-white">{formatCurrency(totalBudget)}</p>
           </div>
           <div className="text-right">
-            <p className="text-sm text-gray-600">Total Spent</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Total Spent</p>
             <p className={`text-2xl font-bold ${
-              totalSpent > totalBudget ? 'text-red-600' : 'text-green-600'
+              totalSpent > totalBudget ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'
             }`}>
               {formatCurrency(totalSpent)}
             </p>
           </div>
         </div>
 
-        <div className="relative w-full h-4 bg-gray-200 rounded-full overflow-hidden">
+        <div className="relative w-full h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
           <div
             className={`absolute top-0 left-0 h-full transition-all ${
               overallPercentage > 100 ? 'bg-red-500' : 'bg-green-500'
@@ -107,9 +107,9 @@ export default function BudgetsView() {
         </div>
 
         <div className="flex justify-between mt-2 text-sm">
-          <span className="text-gray-600">{overallPercentage.toFixed(0)}% used</span>
+          <span className="text-gray-600 dark:text-gray-400">{overallPercentage.toFixed(0)}% used</span>
           <span className={`font-semibold ${
-            totalBudget - totalSpent >= 0 ? 'text-green-600' : 'text-red-600'
+            totalBudget - totalSpent >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
           }`}>
             {formatCurrency(Math.abs(totalBudget - totalSpent))} {
               totalBudget - totalSpent >= 0 ? 'remaining' : 'over budget'
@@ -164,7 +164,7 @@ function CategoryBudgetCard({ category, onUpdateBudget }: CategoryBudgetCardProp
   const isOverBudget = remaining < 0;
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
           <div
@@ -174,8 +174,8 @@ function CategoryBudgetCard({ category, onUpdateBudget }: CategoryBudgetCardProp
             {category.name.charAt(0).toUpperCase()}
           </div>
           <div>
-            <h4 className="font-semibold text-lg">{category.name}</h4>
-            <p className="text-sm text-gray-600">
+            <h4 className="font-semibold text-lg dark:text-white">{category.name}</h4>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               {formatCurrency(category.spent)} of {formatCurrency(category.budget)}
             </p>
           </div>
@@ -188,12 +188,12 @@ function CategoryBudgetCard({ category, onUpdateBudget }: CategoryBudgetCardProp
               step="0.01"
               value={budgetInput}
               onChange={(e) => setBudgetInput(e.target.value)}
-              className="w-32 px-3 py-1 border border-gray-300 rounded text-sm"
+              className="w-32 px-3 py-1 border border-gray-300 dark:border-gray-600 rounded text-sm dark:bg-gray-700 dark:text-white"
               placeholder="0.00"
             />
             <button
               onClick={handleSave}
-              className="px-3 py-1 bg-primary-600 text-white rounded text-sm hover:bg-primary-700"
+              className="px-3 py-1 bg-primary-600 dark:bg-primary-500 text-white rounded text-sm hover:bg-primary-700 dark:hover:bg-primary-600"
             >
               Save
             </button>

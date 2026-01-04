@@ -152,72 +152,74 @@ export default function TransactionsView() {
 
   return (
     <div className="max-w-7xl mx-auto p-4 space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Transactions</h2>
-        <div className="flex gap-2">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <h2 className="text-2xl font-bold dark:text-white">Transactions</h2>
+        <div className="flex gap-2 w-full sm:w-auto">
           <button
             onClick={() => setShowTransferModal(true)}
-            className="flex items-center gap-2 bg-white border-2 border-primary-600 text-primary-600 px-4 py-2 rounded-lg hover:bg-primary-50 transition-colors"
+            className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white dark:bg-gray-700 border-2 border-primary-600 dark:border-primary-500 text-primary-600 dark:text-primary-400 px-4 py-3 min-h-12 rounded-lg hover:bg-primary-50 dark:hover:bg-gray-600 transition-colors font-medium"
           >
             <ArrowLeftRight className="w-5 h-5" />
-            Transfer
+            <span className="hidden xs:inline">Transfer</span>
           </button>
           <button
             onClick={() => setShowModal(true)}
-            className="flex items-center gap-2 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
+            className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-primary-600 dark:bg-primary-500 text-white px-4 py-3 min-h-12 rounded-lg hover:bg-primary-700 dark:hover:bg-primary-600 transition-colors font-medium"
           >
             <Plus className="w-5 h-5" />
-            Add Transaction
+            <span>Add Transaction</span>
           </button>
         </div>
       </div>
 
       {/* Search and Filter Bar */}
-      <div className="bg-white rounded-lg shadow p-4 space-y-4">
-        <div className="flex gap-2">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 space-y-4">
+        <div className="flex flex-col sm:flex-row gap-2">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
             <input
               type="text"
               placeholder="Search transactions..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 min-h-12 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
             />
           </div>
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
-              showFilters || activeFilterCount > 0
-                ? 'bg-primary-600 text-white border-primary-600'
-                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-            }`}
-          >
-            <Filter className="w-5 h-5" />
-            Filters
-            {activeFilterCount > 0 && (
-              <span className="bg-white text-primary-600 px-2 py-0.5 rounded-full text-xs font-semibold">
-                {activeFilterCount}
-              </span>
-            )}
-          </button>
-          {activeFilterCount > 0 && (
+          <div className="flex gap-2">
             <button
-              onClick={clearAllFilters}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+              onClick={() => setShowFilters(!showFilters)}
+              className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-3 min-h-12 rounded-lg border transition-colors ${
+                showFilters || activeFilterCount > 0
+                  ? 'bg-primary-600 dark:bg-primary-500 text-white border-primary-600 dark:border-primary-500'
+                  : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
+              }`}
             >
-              <X className="w-5 h-5" />
-              Clear
+              <Filter className="w-5 h-5" />
+              <span className="hidden xs:inline">Filters</span>
+              {activeFilterCount > 0 && (
+                <span className="bg-white dark:bg-gray-800 text-primary-600 dark:text-primary-400 px-2 py-0.5 rounded-full text-xs font-semibold">
+                  {activeFilterCount}
+                </span>
+              )}
             </button>
-          )}
+            {activeFilterCount > 0 && (
+              <button
+                onClick={clearAllFilters}
+                className="flex items-center justify-center gap-2 px-4 py-3 min-h-12 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+              >
+                <X className="w-5 h-5" />
+                <span className="hidden xs:inline">Clear</span>
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Advanced Filters Panel */}
         {showFilters && (
-          <div className="border-t pt-4 space-y-4">
+          <div className="border-t dark:border-gray-700 pt-4 space-y-4">
             {/* Category Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Categories</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Categories</label>
               <div className="flex flex-wrap gap-2">
                 {categories.filter(c => c.isActive).map(category => (
                   <button
@@ -246,7 +248,7 @@ export default function TransactionsView() {
 
             {/* Account Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Accounts</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Accounts</label>
               <div className="flex flex-wrap gap-2">
                 {accounts.filter(a => a.isActive).map(account => (
                   <button
@@ -276,7 +278,7 @@ export default function TransactionsView() {
             {/* Tags Filter */}
             {allTags.length > 0 && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Tags</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tags</label>
                 <div className="flex flex-wrap gap-2">
                   {allTags.map(tag => (
                     <button
@@ -303,42 +305,42 @@ export default function TransactionsView() {
 
             {/* Amount Range */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Amount Range</label>
-              <div className="flex gap-2 items-center">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Amount Range</label>
+              <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
                 <input
                   type="number"
                   placeholder="Min"
                   value={amountMin}
                   onChange={(e) => setAmountMin(e.target.value)}
-                  className="w-32 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="flex-1 sm:w-32 px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                 />
-                <span className="text-gray-500">to</span>
+                <span className="text-gray-500 dark:text-gray-400 text-center sm:text-left">to</span>
                 <input
                   type="number"
                   placeholder="Max"
                   value={amountMax}
                   onChange={(e) => setAmountMax(e.target.value)}
-                  className="w-32 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="flex-1 sm:w-32 px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                 />
               </div>
             </div>
 
             {/* Date Range */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
-              <div className="flex gap-2 items-center">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Date Range</label>
+              <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
                 <input
                   type="date"
                   value={dateFrom}
                   onChange={(e) => setDateFrom(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="flex-1 px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 />
-                <span className="text-gray-500">to</span>
+                <span className="text-gray-500 dark:text-gray-400 text-center sm:text-left">to</span>
                 <input
                   type="date"
                   value={dateTo}
                   onChange={(e) => setDateTo(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="flex-1 px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 />
               </div>
             </div>
@@ -346,43 +348,43 @@ export default function TransactionsView() {
         )}
 
         {/* Type Filter Buttons */}
-        <div className="flex gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           <button
             onClick={() => setFilterType('all')}
-            className={`px-4 py-2 rounded-lg transition-colors ${
+            className={`px-4 py-3 min-h-12 rounded-lg transition-colors font-medium ${
               filterType === 'all'
-                ? 'bg-primary-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                ? 'bg-primary-600 dark:bg-primary-500 text-white'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
             }`}
           >
             All
           </button>
           <button
             onClick={() => setFilterType('income')}
-            className={`px-4 py-2 rounded-lg transition-colors ${
+            className={`px-4 py-3 min-h-12 rounded-lg transition-colors font-medium ${
               filterType === 'income'
-                ? 'bg-green-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                ? 'bg-green-600 dark:bg-green-500 text-white'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
             }`}
           >
             Income
           </button>
           <button
             onClick={() => setFilterType('expense')}
-            className={`px-4 py-2 rounded-lg transition-colors ${
+            className={`px-4 py-3 min-h-12 rounded-lg transition-colors font-medium ${
               filterType === 'expense'
-                ? 'bg-red-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                ? 'bg-red-600 dark:bg-red-500 text-white'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
             }`}
           >
             Expenses
           </button>
           <button
             onClick={() => setFilterType('transfer')}
-            className={`px-4 py-2 rounded-lg transition-colors ${
+            className={`px-4 py-3 min-h-12 rounded-lg transition-colors font-medium ${
               filterType === 'transfer'
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                ? 'bg-blue-600 dark:bg-blue-500 text-white'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
             }`}
           >
             Transfers
@@ -393,11 +395,11 @@ export default function TransactionsView() {
       {/* Transactions list */}
       <div className="space-y-6">
         {Object.entries(groupedTransactions).map(([month, monthTransactions]) => (
-          <div key={month} className="bg-white rounded-lg shadow">
-            <div className="bg-gray-50 px-4 py-3 border-b flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-gray-600" />
-              <h3 className="font-semibold text-gray-900">{month}</h3>
-              <span className="ml-auto text-sm text-gray-600">
+          <div key={month} className="bg-white dark:bg-gray-800 rounded-lg shadow">
+            <div className="bg-gray-50 dark:bg-gray-700 px-4 py-3 border-b dark:border-gray-600 flex items-center gap-2">
+              <Calendar className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              <h3 className="font-semibold text-gray-900 dark:text-white">{month}</h3>
+              <span className="ml-auto text-sm text-gray-600 dark:text-gray-400">
                 {monthTransactions.length} transaction{monthTransactions.length !== 1 ? 's' : ''}
               </span>
             </div>
@@ -414,10 +416,10 @@ export default function TransactionsView() {
                 return (
                   <div
                     key={transaction.id}
-                    className="p-4 hover:bg-gray-50 transition-colors"
+                    className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                   >
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
+                    <div className="flex flex-col sm:flex-row justify-between items-start gap-3">
+                      <div className="flex-1 w-full">
                         <div className="flex items-center gap-3 mb-1">
                           <div
                             className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm ${
@@ -434,8 +436,8 @@ export default function TransactionsView() {
                             )}
                           </div>
                           <div>
-                            <h4 className="font-semibold">{transaction.description}</h4>
-                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                            <h4 className="font-semibold dark:text-gray-200">{transaction.description}</h4>
+                            <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                               {isTransfer ? (
                                 <>
                                   <span>{account?.name}</span>
@@ -466,7 +468,7 @@ export default function TransactionsView() {
                             {transaction.tags.map((tag, idx) => (
                               <span
                                 key={idx}
-                                className="inline-block px-2 py-0.5 bg-primary-100 text-primary-700 rounded text-xs"
+                                className="inline-block px-2 py-0.5 bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 rounded text-xs"
                               >
                                 {tag}
                               </span>
@@ -474,16 +476,16 @@ export default function TransactionsView() {
                           </div>
                         )}
                         {transaction.notes && (
-                          <p className="text-sm text-gray-600 ml-13 mt-1">{transaction.notes}</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 ml-13 mt-1">{transaction.notes}</p>
                         )}
                       </div>
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
                         <span className={`text-lg font-bold ${
                           transaction.type === 'income' 
-                            ? 'text-green-600' 
+                            ? 'text-green-600 dark:text-green-400' 
                             : transaction.type === 'transfer'
-                            ? 'text-blue-600'
-                            : 'text-red-600'
+                            ? 'text-blue-600 dark:text-blue-400'
+                            : 'text-red-600 dark:text-red-400'
                         }`}>
                           {transaction.type === 'income' ? '+' : transaction.type === 'transfer' ? '→' : '-'}
                           {formatCurrency(transaction.amount)}
@@ -492,16 +494,16 @@ export default function TransactionsView() {
                           {transaction.type !== 'transfer' && (
                             <button
                               onClick={() => handleEdit(transaction)}
-                              className="p-2 text-gray-600 hover:text-primary-600 transition-colors"
+                              className="p-3 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                             >
-                              <Edit2 className="w-4 h-4" />
+                              <Edit2 className="w-5 h-5" />
                             </button>
                           )}
                           <button
                             onClick={() => handleDelete(transaction.id!)}
-                            className="p-2 text-gray-600 hover:text-red-600 transition-colors"
+                            className="p-3 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-5 h-5" />
                           </button>
                         </div>
                       </div>
@@ -515,11 +517,11 @@ export default function TransactionsView() {
       </div>
 
       {filteredTransactions.length === 0 && (
-        <div className="text-center py-12 bg-white rounded-lg shadow">
-          <p className="text-gray-500 mb-4">No transactions yet</p>
+        <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg shadow">
+          <p className="text-gray-500 dark:text-gray-400 mb-4">No transactions yet</p>
           <button
             onClick={() => setShowModal(true)}
-            className="text-primary-600 hover:text-primary-700 font-medium"
+            className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
           >
             Add your first transaction
           </button>

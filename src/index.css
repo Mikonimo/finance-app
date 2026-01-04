@@ -20,6 +20,11 @@ body {
   min-height: 100vh;
 }
 
+/* Dark mode overrides */
+.dark {
+  color-scheme: dark;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
@@ -29,6 +34,10 @@ body {
   background: #f1f1f1;
 }
 
+.dark ::-webkit-scrollbar-track {
+  background: #1f2937;
+}
+
 ::-webkit-scrollbar-thumb {
   background: #888;
   border-radius: 4px;
@@ -36,4 +45,30 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+@layer utilities {
+  .dark-card {
+    @apply dark:bg-gray-800 dark:border-gray-700;
+  }
+  
+  .dark-input {
+    @apply dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400;
+  }
+  
+  .dark-text {
+    @apply dark:text-gray-200;
+  }
+  
+  .dark-text-muted {
+    @apply dark:text-gray-400;
+  }
 }

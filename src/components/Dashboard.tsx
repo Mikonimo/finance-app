@@ -114,8 +114,8 @@ export default function Dashboard() {
   return (
     <div className="max-w-7xl mx-auto p-4 space-y-6">
       {/* Date Range Selector */}
-      <div className="bg-white rounded-lg shadow p-4">
-        <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+        <h2 className="text-lg font-semibold mb-3 flex items-center gap-2 dark:text-white">
           <Calendar className="w-5 h-5" />
           Period
         </h2>
@@ -127,7 +127,7 @@ export default function Dashboard() {
             className={`px-3 py-2 text-sm rounded-lg transition-colors ${
               dateRangePreset === 'week'
                 ? 'bg-primary-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
             }`}
           >
             This Week
@@ -137,7 +137,7 @@ export default function Dashboard() {
             className={`px-3 py-2 text-sm rounded-lg transition-colors ${
               dateRangePreset === 'month'
                 ? 'bg-primary-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
             }`}
           >
             This Month
@@ -147,7 +147,7 @@ export default function Dashboard() {
             className={`px-3 py-2 text-sm rounded-lg transition-colors ${
               dateRangePreset === '3months'
                 ? 'bg-primary-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
             }`}
           >
             3 Months
@@ -157,7 +157,7 @@ export default function Dashboard() {
             className={`px-3 py-2 text-sm rounded-lg transition-colors ${
               dateRangePreset === '6months'
                 ? 'bg-primary-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
             }`}
           >
             6 Months
@@ -167,7 +167,7 @@ export default function Dashboard() {
             className={`px-3 py-2 text-sm rounded-lg transition-colors ${
               dateRangePreset === 'year'
                 ? 'bg-primary-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
             }`}
           >
             This Year
@@ -177,7 +177,7 @@ export default function Dashboard() {
             className={`px-3 py-2 text-sm rounded-lg transition-colors ${
               dateRangePreset === 'custom'
                 ? 'bg-primary-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
             }`}
           >
             Custom
@@ -188,21 +188,21 @@ export default function Dashboard() {
         {dateRangePreset === 'custom' && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
             <div>
-              <label className="block text-xs text-gray-600 mb-1">Start Date</label>
+              <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Start Date</label>
               <input
                 type="date"
                 value={customStartDate}
                 onChange={(e) => setCustomStartDate(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-white"
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-600 mb-1">End Date</label>
+              <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">End Date</label>
               <input
                 type="date"
                 value={customEndDate}
                 onChange={(e) => setCustomEndDate(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-white"
               />
             </div>
           </div>
@@ -213,18 +213,18 @@ export default function Dashboard() {
           {dateRangePreset === 'month' && (
             <button
               onClick={() => useAppStore.setState({ selectedMonth: subMonths(selectedMonth, 1) })}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors dark:text-gray-200"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
           )}
-          <p className="text-xl font-bold text-slate-900">
+          <p className="text-xl font-bold text-slate-900 dark:text-white">
             {getPeriodDisplayText()}
           </p>
           {dateRangePreset === 'month' && (
             <button
               onClick={() => useAppStore.setState({ selectedMonth: subMonths(selectedMonth, -1) })}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors dark:text-gray-200"
             >
               <ChevronRight className="w-5 h-5" />
             </button>
@@ -234,11 +234,11 @@ export default function Dashboard() {
 
       {/* Summary cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Total Balance</p>
-              <p className="text-2xl font-bold text-slate-900 mt-1">
+              <p className="text-sm text-gray-600 dark:text-gray-400">Total Balance</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1">
                 {formatCurrency(totalBalance)}
               </p>
             </div>
@@ -246,11 +246,11 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Income</p>
-              <p className="text-2xl font-bold text-green-600 mt-1">
+              <p className="text-sm text-gray-600 dark:text-gray-400">Income</p>
+              <p className="text-2xl font-bold text-green-600 dark:text-green-400 mt-1">
                 {formatCurrency(income)}
               </p>
             </div>
@@ -258,11 +258,11 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Expenses</p>
-              <p className="text-2xl font-bold text-red-600 mt-1">
+              <p className="text-sm text-gray-600 dark:text-gray-400">Expenses</p>
+              <p className="text-2xl font-bold text-red-600 dark:text-red-400 mt-1">
                 {formatCurrency(expenses)}
               </p>
             </div>
@@ -272,17 +272,17 @@ export default function Dashboard() {
       </div>
 
       {/* Net cash flow */}
-      <div className={`rounded-lg shadow p-6 ${netCashFlow >= 0 ? 'bg-green-50' : 'bg-red-50'}`}>
-        <p className="text-sm text-gray-700">Net Cash Flow</p>
-        <p className={`text-3xl font-bold mt-1 ${netCashFlow >= 0 ? 'text-green-700' : 'text-red-700'}`}>
+      <div className={`rounded-lg shadow p-6 ${netCashFlow >= 0 ? 'bg-green-50 dark:bg-green-900/20' : 'bg-red-50 dark:bg-red-900/20'}`}>
+        <p className="text-sm text-gray-700 dark:text-gray-300">Net Cash Flow</p>
+        <p className={`text-3xl font-bold mt-1 ${netCashFlow >= 0 ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'}`}>
           {formatCurrency(netCashFlow)}
         </p>
       </div>
 
       {/* Spending by category chart */}
       {chartData.length > 0 && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold mb-4">Spending by Category</h3>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold mb-4 dark:text-white">Spending by Category</h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
@@ -315,9 +315,9 @@ export default function Dashboard() {
                     >
                       {Icon && <Icon className="w-4 h-4 text-white" />}
                     </div>
-                    <span className="text-sm">{item.name}</span>
+                    <span className="text-sm dark:text-gray-200">{item.name}</span>
                   </div>
-                  <span className="text-sm font-semibold">{formatCurrency(item.value)}</span>
+                  <span className="text-sm font-semibold dark:text-gray-200">{formatCurrency(item.value)}</span>
                 </div>
               );
             })}
@@ -326,10 +326,10 @@ export default function Dashboard() {
       )}
 
       {/* Recent transactions */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold mb-4">Recent Transactions</h3>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h3 className="text-lg font-semibold mb-4 dark:text-white">Recent Transactions</h3>
         {monthTransactions.length === 0 ? (
-          <p className="text-gray-500 text-center py-8">No transactions this month</p>
+          <p className="text-gray-500 dark:text-gray-400 text-center py-8">No transactions this month</p>
         ) : (
           <div className="space-y-3">
             {monthTransactions.slice(0, 5).map((transaction) => {
@@ -345,8 +345,8 @@ export default function Dashboard() {
                       {Icon ? <Icon className="w-5 h-5 text-white" /> : category?.name.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <p className="font-medium">{transaction.description}</p>
-                      <p className="text-sm text-gray-600">
+                      <p className="font-medium dark:text-gray-200">{transaction.description}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
                         {transaction.payee && <span className="font-medium">{transaction.payee} • </span>}
                         {category?.name}
                       </p>
@@ -355,7 +355,7 @@ export default function Dashboard() {
                           {transaction.tags.map((tag, idx) => (
                             <span
                               key={idx}
-                              className="inline-block px-2 py-0.5 bg-primary-100 text-primary-700 rounded text-xs"
+                              className="inline-block px-2 py-0.5 bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 rounded text-xs"
                             >
                               {tag}
                             </span>
@@ -365,7 +365,7 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <p className={`font-semibold ${
-                    transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
+                    transaction.type === 'income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
                   }`}>
                     {transaction.type === 'income' ? '+' : '-'}
                     {formatCurrency(transaction.amount)}

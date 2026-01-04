@@ -14,7 +14,7 @@ export default function Navigation() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 md:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 md:hidden">
       <div className="flex justify-around">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -27,8 +27,8 @@ export default function Navigation() {
               className={clsx(
                 'flex flex-col items-center gap-1 py-3 px-4 flex-1 transition-colors',
                 isActive
-                  ? 'text-primary-600'
-                  : 'text-gray-600 hover:text-primary-500'
+                  ? 'text-primary-600 dark:text-primary-400'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-300'
               )}
             >
               <Icon className="w-6 h-6" />

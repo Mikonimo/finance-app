@@ -16,7 +16,7 @@ export default function Header() {
   ];
 
   return (
-    <header className="bg-slate-900 text-white shadow-lg sticky top-0 z-50">
+    <header className="bg-slate-900 dark:bg-gray-800 text-white shadow-lg sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -37,8 +37,8 @@ export default function Header() {
                   className={clsx(
                     'flex items-center gap-2 px-4 py-2 rounded-lg transition-colors',
                     isActive
-                      ? 'bg-primary-600 text-white'
-                      : 'text-gray-300 hover:bg-slate-800 hover:text-white'
+                      ? 'bg-primary-600 dark:bg-primary-500 text-white'
+                      : 'text-gray-300 dark:text-gray-400 hover:bg-slate-800 dark:hover:bg-gray-700 hover:text-white'
                   )}
                 >
                   <Icon className="w-5 h-5" />

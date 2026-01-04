@@ -232,7 +232,7 @@ export default function TransactionForm({ transaction, onClose }: TransactionFor
           placeholder="e.g., Walmart, Starbucks"
         />
         {showPayeeSuggestions && payeeSuggestions.length > 0 && (
-          <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-40 overflow-y-auto">
+          <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-40 overflow-y-auto">
             {payeeSuggestions.slice(0, 5).map((payee, index) => (
               <button
                 key={index}
@@ -241,7 +241,7 @@ export default function TransactionForm({ transaction, onClose }: TransactionFor
                   setFormData({ ...formData, payee });
                   setShowPayeeSuggestions(false);
                 }}
-                className="w-full text-left px-3 py-2 hover:bg-gray-100 transition-colors"
+                className="w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors dark:text-gray-200"
               >
                 {payee}
               </button>
@@ -347,20 +347,20 @@ export default function TransactionForm({ transaction, onClose }: TransactionFor
           placeholder="Type and press Enter to add tags"
         />
         {showTagSuggestions && tagSuggestions.length > 0 && (
-          <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-40 overflow-y-auto">
+          <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-40 overflow-y-auto">
             {tagSuggestions.slice(0, 8).map((tag, index) => (
               <button
                 key={index}
                 type="button"
                 onClick={() => addTag(tag)}
-                className="w-full text-left px-3 py-2 hover:bg-gray-100 transition-colors"
+                className="w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors dark:text-gray-200"
               >
                 {tag}
               </button>
             ))}
           </div>
         )}
-        <p className="text-xs text-gray-500 mt-1">
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
           Press Enter to add, Backspace to remove last tag
         </p>
       </div>

@@ -153,10 +153,10 @@ export default function ReportsView() {
   return (
     <div className="max-w-7xl mx-auto p-4 space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Reports & Analytics</h2>
+        <h2 className="text-2xl font-bold dark:text-white">Reports</h2>
         <button
           onClick={handleExportCSV}
-          className="flex items-center gap-2 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
+          className="flex items-center gap-2 bg-primary-600 dark:bg-primary-500 text-white px-4 py-2 rounded-lg hover:bg-primary-700 dark:hover:bg-primary-600 transition-colors"
         >
           <Download className="w-5 h-5" />
           Export CSV
@@ -164,10 +164,10 @@ export default function ReportsView() {
       </div>
 
       {/* Date Range Selector */}
-      <div className="bg-white rounded-lg shadow p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
         <div className="flex items-center gap-2 mb-3">
-          <Calendar className="w-5 h-5 text-gray-600" />
-          <h3 className="font-semibold">Date Range</h3>
+          <Calendar className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+          <h3 className="font-semibold dark:text-white">Date Range</h3>
         </div>
         <div className="flex flex-wrap gap-2 mb-4">
           {[
@@ -183,8 +183,8 @@ export default function ReportsView() {
               onClick={() => setDateRange(option.value as any)}
               className={`px-4 py-2 rounded-lg transition-colors ${
                 dateRange === option.value
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-primary-600 dark:bg-primary-500 text-white'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
               }`}
             >
               {option.label}
@@ -197,55 +197,55 @@ export default function ReportsView() {
               type="date"
               value={customStartDate}
               onChange={(e) => setCustomStartDate(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
             />
-            <span className="text-gray-500">to</span>
+            <span className="text-gray-500 dark:text-gray-400">to</span>
             <input
               type="date"
               value={customEndDate}
               onChange={(e) => setCustomEndDate(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
             />
           </div>
         )}
-        <p className="text-sm text-gray-600 mt-2">
+        <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
           Showing data from {format(start, 'MMM d, yyyy')} to {format(end, 'MMM d, yyyy')}
         </p>
       </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-gray-600">Total Income</span>
-            <TrendingUp className="w-5 h-5 text-green-600" />
+            <span className="text-sm text-gray-600 dark:text-gray-400">Total Income</span>
+            <TrendingUp className="w-5 h-5 text-green-600 dark:text-green-400" />
           </div>
-          <p className="text-2xl font-bold text-green-600">{formatCurrency(totalIncome)}</p>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-2xl font-bold text-green-600 dark:text-green-400">{formatCurrency(totalIncome)}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
             {filteredTransactions.filter(t => t.type === 'income').length} transactions
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-gray-600">Total Expenses</span>
-            <TrendingUp className="w-5 h-5 text-red-600 transform rotate-180" />
+            <span className="text-sm text-gray-600 dark:text-gray-400">Total Expenses</span>
+            <TrendingUp className="w-5 h-5 text-red-600 dark:text-red-400 transform rotate-180" />
           </div>
-          <p className="text-2xl font-bold text-red-600">{formatCurrency(totalExpenses)}</p>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-2xl font-bold text-red-600 dark:text-red-400">{formatCurrency(totalExpenses)}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
             {filteredTransactions.filter(t => t.type === 'expense').length} transactions
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-gray-600">Net Savings</span>
-            <BarChart3 className={`w-5 h-5 ${netSavings >= 0 ? 'text-green-600' : 'text-red-600'}`} />
+            <span className="text-sm text-gray-600 dark:text-gray-400">Net Savings</span>
+            <BarChart3 className={`w-5 h-5 ${netSavings >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`} />
           </div>
-          <p className={`text-2xl font-bold ${netSavings >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+          <p className={`text-2xl font-bold ${netSavings >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
             {formatCurrency(netSavings)}
           </p>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
             {netSavings >= 0 ? 'Surplus' : 'Deficit'}
           </p>
         </div>

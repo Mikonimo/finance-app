@@ -11,12 +11,12 @@ export default function AccountsView() {
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
 
   const accounts = useLiveQuery(
-    () => db.accounts.where('isActive').equals(1).toArray(),
+    () => db.accounts.filter(a => a.isActive === true || (a.isActive as any) === 1).toArray(),
     []
   );
 
   const transactions = useLiveQuery(
-    () => db.transactions.filter(t => t.isActive !== false).toArray(),
+    () => db.transactions.filter(t => t.isActive !== false && (t.isActive as any) !== 0).toArray(),
     []
   );
 

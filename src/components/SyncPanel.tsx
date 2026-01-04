@@ -65,12 +65,22 @@ export default function SyncPanel() {
         createdAt: snap.createdAt ? new Date(snap.createdAt).toISOString() : new Date().toISOString(),
       }));
 
+      const formattedCategories = categories.map(cat => ({
+        ...cat,
+        isActive: cat.isActive ? 1 : 0, // Convert boolean to integer for SQLite
+        parentCategoryId: cat.parentCategoryId || null, // Ensure null instead of undefined
+      }));
+
+      const formattedBudgets = budgets.map(budget => ({
+        ...budget,
+      }));
+
       // Push to server
       const result = await api.sync.push({
         accounts: formattedAccounts,
-        categories,
+        categories: formattedCategories,
         transactions: formattedTransactions,
-        budgets,
+        budgets: formattedBudgets,
         recurringTransactions: formattedRecurring,
         netWorthSnapshots: formattedSnapshots,
       });

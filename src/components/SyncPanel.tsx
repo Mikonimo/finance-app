@@ -104,18 +104,10 @@ export default function SyncPanel() {
       // Import accounts
       if (serverData.accounts && serverData.accounts.length > 0) {
         for (const account of serverData.accounts) {
-          const existingAccount = await db.accounts.get(account.id);
-          if (existingAccount) {
-            await db.accounts.update(account.id, {
-              ...account,
-              createdAt: new Date(account.createdAt),
-            });
-          } else {
-            await db.accounts.add({
-              ...account,
-              createdAt: new Date(account.createdAt),
-            });
-          }
+          await db.accounts.put({
+            ...account,
+            createdAt: new Date(account.createdAt),
+          });
           imported++;
         }
       }
@@ -123,12 +115,7 @@ export default function SyncPanel() {
       // Import categories
       if (serverData.categories && serverData.categories.length > 0) {
         for (const category of serverData.categories) {
-          const existingCategory = await db.categories.get(category.id);
-          if (existingCategory) {
-            await db.categories.update(category.id, category);
-          } else {
-            await db.categories.add(category);
-          }
+          await db.categories.put(category);
           imported++;
         }
       }
@@ -136,20 +123,11 @@ export default function SyncPanel() {
       // Import transactions
       if (serverData.transactions && serverData.transactions.length > 0) {
         for (const transaction of serverData.transactions) {
-          const existingTransaction = await db.transactions.get(transaction.id);
-          if (existingTransaction) {
-            await db.transactions.update(transaction.id, {
-              ...transaction,
-              date: new Date(transaction.date),
-              createdAt: new Date(transaction.createdAt),
-            });
-          } else {
-            await db.transactions.add({
-              ...transaction,
-              date: new Date(transaction.date),
-              createdAt: new Date(transaction.createdAt),
-            });
-          }
+          await db.transactions.put({
+            ...transaction,
+            date: new Date(transaction.date),
+            createdAt: new Date(transaction.createdAt),
+          });
           imported++;
         }
       }
@@ -157,12 +135,7 @@ export default function SyncPanel() {
       // Import budgets
       if (serverData.budgets && serverData.budgets.length > 0) {
         for (const budget of serverData.budgets) {
-          const existingBudget = await db.budgets.get(budget.id);
-          if (existingBudget) {
-            await db.budgets.update(budget.id, budget);
-          } else {
-            await db.budgets.add(budget);
-          }
+          await db.budgets.put(budget);
           imported++;
         }
       }
@@ -170,24 +143,13 @@ export default function SyncPanel() {
       // Import recurring transactions
       if (serverData.recurringTransactions && serverData.recurringTransactions.length > 0) {
         for (const recurring of serverData.recurringTransactions) {
-          const existingRecurring = await db.recurringTransactions.get(recurring.id);
-          if (existingRecurring) {
-            await db.recurringTransactions.update(recurring.id, {
-              ...recurring,
-              startDate: new Date(recurring.startDate),
-              endDate: recurring.endDate ? new Date(recurring.endDate) : undefined,
-              lastProcessed: new Date(recurring.lastProcessed),
-              createdAt: new Date(recurring.createdAt),
-            });
-          } else {
-            await db.recurringTransactions.add({
-              ...recurring,
-              startDate: new Date(recurring.startDate),
-              endDate: recurring.endDate ? new Date(recurring.endDate) : undefined,
-              lastProcessed: new Date(recurring.lastProcessed),
-              createdAt: new Date(recurring.createdAt),
-            });
-          }
+          await db.recurringTransactions.put({
+            ...recurring,
+            startDate: new Date(recurring.startDate),
+            endDate: recurring.endDate ? new Date(recurring.endDate) : undefined,
+            lastProcessed: new Date(recurring.lastProcessed),
+            createdAt: new Date(recurring.createdAt),
+          });
           imported++;
         }
       }
@@ -195,20 +157,11 @@ export default function SyncPanel() {
       // Import net worth snapshots
       if (serverData.netWorthSnapshots && serverData.netWorthSnapshots.length > 0) {
         for (const snapshot of serverData.netWorthSnapshots) {
-          const existingSnapshot = await db.netWorthSnapshots.get(snapshot.id);
-          if (existingSnapshot) {
-            await db.netWorthSnapshots.update(snapshot.id, {
-              ...snapshot,
-              date: new Date(snapshot.date),
-              createdAt: new Date(snapshot.createdAt),
-            });
-          } else {
-            await db.netWorthSnapshots.add({
-              ...snapshot,
-              date: new Date(snapshot.date),
-              createdAt: new Date(snapshot.createdAt),
-            });
-          }
+          await db.netWorthSnapshots.put({
+            ...snapshot,
+            date: new Date(snapshot.date),
+            createdAt: new Date(snapshot.createdAt),
+          });
           imported++;
         }
       }

@@ -25,7 +25,10 @@ export default function TransactionsView() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   const transactions = useLiveQuery(
-    () => db.transactions.orderBy('date').reverse().toArray(),
+    async () => {
+      const all = await db.transactions.orderBy('date').reverse().toArray();
+      return all.filter(t => t.isActive !== false);
+    },
     []
   );
 

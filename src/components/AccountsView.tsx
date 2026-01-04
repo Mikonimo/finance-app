@@ -16,7 +16,7 @@ export default function AccountsView() {
   );
 
   const transactions = useLiveQuery(
-    () => db.transactions.toArray(),
+    () => db.transactions.filter(t => t.isActive !== false).toArray(),
     []
   );
 

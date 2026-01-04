@@ -27,14 +27,14 @@ export default function SyncPanel() {
       const recurringTransactions = await db.recurringTransactions.toArray();
       const netWorthSnapshots = await db.netWorthSnapshots.toArray();
 
-      console.log('📤 Preparing to push:', {
+      console.log('📤 Preparing to push:', JSON.stringify({
         accounts: accounts.length,
         categories: categories.length,
         transactions: transactions.length,
         budgets: budgets.length,
         recurringTransactions: recurringTransactions.length,
         netWorthSnapshots: netWorthSnapshots.length,
-      });
+      }, null, 2));
 
       // Convert dates to ISO strings for API
       const formattedAccounts = accounts.map(acc => ({
@@ -159,6 +159,7 @@ export default function SyncPanel() {
           await db.accounts.put({
             ...account,
             createdAt: new Date(account.createdAt),
+            isActive: account.isActive !== 0, // Convert from SQLite integer (0/1) to boolean
           });
           imported++;
         }
@@ -167,7 +168,10 @@ export default function SyncPanel() {
       // Import categories
       if (serverData.categories && serverData.categories.length > 0) {
         for (const category of serverData.categories) {
-          await db.categories.put(category);
+          await db.categories.put({
+            ...category,
+            isActive: category.isActive !== 0, // Convert from SQLite integer (0/1) to boolean
+          });
           imported++;
         }
       }
@@ -179,6 +183,7 @@ export default function SyncPanel() {
             ...transaction,
             date: new Date(transaction.date),
             createdAt: new Date(transaction.createdAt),
+            isActive: transaction.isActive !== 0, // Convert from SQLite integer (0/1) to boolean
           });
           imported++;
         }
@@ -201,6 +206,7 @@ export default function SyncPanel() {
             endDate: recurring.endDate ? new Date(recurring.endDate) : undefined,
             lastProcessed: new Date(recurring.lastProcessed),
             createdAt: new Date(recurring.createdAt),
+            isActive: recurring.isActive !== 0, // Convert from SQLite integer (0/1) to boolean
           });
           imported++;
         }
@@ -271,6 +277,7 @@ export default function SyncPanel() {
           await db.accounts.put({
             ...account,
             createdAt: new Date(account.createdAt),
+            isActive: account.isActive !== 0,
           });
           imported++;
         }
@@ -278,7 +285,10 @@ export default function SyncPanel() {
 
       if (serverData.categories?.length > 0) {
         for (const category of serverData.categories) {
-          await db.categories.put(category);
+          await db.categories.put({
+            ...category,
+            isActive: category.isActive !== 0,
+          });
           imported++;
         }
       }
@@ -289,6 +299,7 @@ export default function SyncPanel() {
             ...transaction,
             date: new Date(transaction.date),
             createdAt: new Date(transaction.createdAt),
+            isActive: transaction.isActive !== 0,
           });
           imported++;
         }
@@ -309,6 +320,7 @@ export default function SyncPanel() {
             endDate: recurring.endDate ? new Date(recurring.endDate) : undefined,
             lastProcessed: new Date(recurring.lastProcessed),
             createdAt: new Date(recurring.createdAt),
+            isActive: recurring.isActive !== 0,
           });
           imported++;
         }

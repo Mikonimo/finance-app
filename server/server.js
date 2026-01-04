@@ -103,11 +103,12 @@ app.post('/api/sync/push', (req, res) => {
     const { accounts, categories, transactions, budgets, recurringTransactions, netWorthSnapshots } = req.body;
     const results = { inserted: 0, updated: 0, errors: [] };
 
-    // Process each table
+    // Process each table with upsert logic
     if (accounts) {
       accounts.forEach(item => {
         try {
-          if (item.id) {
+          const existing = item.id ? queries.getById('accounts', item.id) : null;
+          if (existing) {
             queries.update('accounts', item.id, item);
             results.updated++;
           } else {
@@ -123,7 +124,8 @@ app.post('/api/sync/push', (req, res) => {
     if (categories) {
       categories.forEach(item => {
         try {
-          if (item.id) {
+          const existing = item.id ? queries.getById('categories', item.id) : null;
+          if (existing) {
             queries.update('categories', item.id, item);
             results.updated++;
           } else {
@@ -145,7 +147,8 @@ app.post('/api/sync/push', (req, res) => {
             tags: item.tags ? JSON.stringify(item.tags) : null
           };
           
-          if (item.id) {
+          const existing = item.id ? queries.getById('transactions', item.id) : null;
+          if (existing) {
             queries.update('transactions', item.id, processedItem);
             results.updated++;
           } else {
@@ -161,7 +164,8 @@ app.post('/api/sync/push', (req, res) => {
     if (budgets) {
       budgets.forEach(item => {
         try {
-          if (item.id) {
+          const existing = item.id ? queries.getById('budgets', item.id) : null;
+          if (existing) {
             queries.update('budgets', item.id, item);
             results.updated++;
           } else {
@@ -183,7 +187,8 @@ app.post('/api/sync/push', (req, res) => {
             tags: item.tags ? JSON.stringify(item.tags) : null
           };
           
-          if (item.id) {
+          const existing = item.id ? queries.getById('recurring_transactions', item.id) : null;
+          if (existing) {
             queries.update('recurring_transactions', item.id, dataToSave);
             results.updated++;
           } else {
@@ -199,7 +204,8 @@ app.post('/api/sync/push', (req, res) => {
     if (netWorthSnapshots) {
       netWorthSnapshots.forEach(item => {
         try {
-          if (item.id) {
+          const existing = item.id ? queries.getById('networth_snapshots', item.id) : null;
+          if (existing) {
             queries.update('networth_snapshots', item.id, item);
             results.updated++;
           } else {

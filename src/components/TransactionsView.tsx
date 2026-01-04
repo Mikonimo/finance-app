@@ -45,7 +45,7 @@ export default function TransactionsView() {
 
   const handleDelete = async (id: number) => {
     if (confirm('Are you sure you want to delete this transaction?')) {
-      await db.transactions.delete(id);
+      await db.transactions.update(id, { isActive: false });
     }
   };
 
@@ -65,6 +65,9 @@ export default function TransactionsView() {
   ).sort();
 
   const filteredTransactions = transactions.filter(t => {
+    // Only show active transactions (not deleted)
+    if (t.isActive === false) return false;
+
     // Type filter
     if (filterType !== 'all' && t.type !== filterType) return false;
 

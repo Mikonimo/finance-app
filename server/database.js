@@ -100,6 +100,13 @@ export function initDatabase() {
   } catch (error) {
     // Column already exists, ignore
   }
+  
+  try {
+    db.exec(`ALTER TABLE transactions ADD COLUMN isActive INTEGER DEFAULT 1`);
+    console.log('✅ Added isActive column to transactions table');
+  } catch (error) {
+    // Column already exists, ignore
+  }
 
   // Budgets table
   db.exec(`

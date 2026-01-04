@@ -138,6 +138,7 @@ export default function TransactionForm({ transaction, onClose }: TransactionFor
       ...formData,
       date: new Date(formData.date),
       createdAt: new Date(),
+      isActive: true, // Set as active by default
     };
 
     if (transaction?.id) {

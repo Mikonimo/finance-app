@@ -24,6 +24,7 @@ export interface Transaction {
   tags?: string[];
   notes?: string;
   createdAt: Date;
+  isActive?: boolean; // For soft deletes
 }
 
 export interface Category {
@@ -102,6 +103,15 @@ export class FinanceDB extends Dexie {
     this.version(3).stores({
       accounts: '++id, name, type, isActive',
       transactions: '++id, accountId, date, categoryId, type, payee',
+      categories: '++id, name, type, parentCategoryId, isActive',
+      budgets: '++id, categoryId, month',
+      recurringTransactions: '++id, accountId, frequency, startDate, isActive',
+      netWorthSnapshots: '++id, date'
+    });
+
+    this.version(4).stores({
+      accounts: '++id, name, type, isActive',
+      transactions: '++id, accountId, date, categoryId, type, payee, isActive',
       categories: '++id, name, type, parentCategoryId, isActive',
       budgets: '++id, categoryId, month',
       recurringTransactions: '++id, accountId, frequency, startDate, isActive',

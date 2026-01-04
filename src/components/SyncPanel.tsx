@@ -98,6 +98,12 @@ export default function SyncPanel() {
         : localStorage.getItem('lastSyncTime') || undefined;
       
       const serverData = await api.sync.pull(lastSyncTime);
+      
+      console.log('📥 Server data received:', {
+        accounts: serverData.accounts?.length || 0,
+        categories: serverData.categories?.length || 0,
+        transactions: serverData.transactions?.length || 0,
+      });
 
       let imported = 0;
 
@@ -169,6 +175,8 @@ export default function SyncPanel() {
       const timestamp = serverData.timestamp || new Date().toISOString();
       localStorage.setItem('lastSyncTime', timestamp);
       setLastSync(timestamp);
+
+      console.log('✅ Sync pull completed:', { imported, timestamp });
 
       setSyncStatus({
         type: 'success',

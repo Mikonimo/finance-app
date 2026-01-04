@@ -73,6 +73,17 @@ export default function SyncPanel() {
       });
 
       console.log('✅ Push result:', result);
+      
+      if (result.errors && result.errors.length > 0) {
+        console.error('❌ Push errors:', result.errors);
+        result.errors.forEach((err: any, idx: number) => {
+          console.error(`Error ${idx + 1}:`, {
+            table: err.table,
+            item: err.item,
+            error: err.error
+          });
+        });
+      }
 
       const timestamp = new Date().toISOString();
       localStorage.setItem('lastSyncTime', timestamp);

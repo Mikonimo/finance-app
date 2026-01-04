@@ -245,7 +245,7 @@ export default function SettingsView() {
               return (
                 <div
                   key={recurring.id}
-                  className={`flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 ${
+                  className={`flex items-center justify-between p-3 border dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 ${
                     !recurring.isActive ? 'opacity-50' : ''
                   }`}
                 >
@@ -258,14 +258,14 @@ export default function SettingsView() {
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="font-medium">{recurring.description}</span>
+                        <span className="font-medium dark:text-gray-200">{recurring.description}</span>
                         <span className={`text-xs px-2 py-0.5 rounded ${
                           recurring.type === 'income' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
                         }`}>
                           {recurring.frequency}
                         </span>
                       </div>
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-gray-600 dark:text-gray-400">
                         {account?.name} • {category?.name} • {formatCurrency(recurring.amount)}
                       </div>
                     </div>
@@ -275,21 +275,21 @@ export default function SettingsView() {
                       onClick={() => handleToggleRecurring(recurring.id!, recurring.isActive)}
                       className={`px-3 py-1 rounded text-sm ${
                         recurring.isActive 
-                          ? 'bg-green-100 text-green-700 hover:bg-green-200' 
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-800' 
+                          : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                       }`}
                     >
                       {recurring.isActive ? 'Active' : 'Paused'}
                     </button>
                     <button
                       onClick={() => handleEditRecurring(recurring)}
-                      className="p-2 text-gray-600 hover:text-primary-600 transition-colors"
+                      className="p-2 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDeleteRecurring(recurring.id!)}
-                      className="p-2 text-gray-600 hover:text-red-600 transition-colors"
+                      className="p-2 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -302,19 +302,19 @@ export default function SettingsView() {
       </div>
 
       {/* Data Management */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold mb-4">Data Management</h3>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h3 className="text-lg font-semibold mb-4 dark:text-white">Data Management</h3>
 
         <div className="space-y-3">
           <button
             onClick={handleExportData}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-primary-600 text-primary-600 rounded-lg hover:bg-primary-50 transition-colors"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-primary-600 dark:border-primary-500 text-primary-600 dark:text-primary-400 rounded-lg hover:bg-primary-50 dark:hover:bg-gray-700 transition-colors"
           >
             <Download className="w-5 h-5" />
             Export All Data
           </button>
 
-          <label className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-primary-600 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors cursor-pointer">
+          <label className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-primary-600 dark:border-primary-500 bg-primary-600 dark:bg-primary-500 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-600 transition-colors cursor-pointer">
             <Upload className="w-5 h-5" />
             Import Data
             <input
@@ -325,9 +325,9 @@ export default function SettingsView() {
             />
           </label>
 
-          <div className="flex items-start gap-2 p-4 bg-blue-50 rounded-lg">
-            <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-blue-900">
+          <div className="flex items-start gap-2 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+            <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+            <p className="text-sm text-blue-900 dark:text-blue-300">
               Export your data regularly to create backups. Import will replace all existing data.
             </p>
           </div>
@@ -335,12 +335,12 @@ export default function SettingsView() {
       </div>
 
       {/* Categories Management */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold">Categories</h3>
+          <h3 className="text-lg font-semibold dark:text-white">Categories</h3>
           <button
             onClick={() => setShowCategoryModal(true)}
-            className="flex items-center gap-2 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
+            className="flex items-center gap-2 bg-primary-600 dark:bg-primary-500 text-white px-4 py-2 rounded-lg hover:bg-primary-700 dark:hover:bg-primary-600 transition-colors"
           >
             <Plus className="w-5 h-5" />
             Add Category
@@ -349,7 +349,7 @@ export default function SettingsView() {
 
         {/* Income Categories */}
         <div className="mb-6">
-          <h4 className="font-semibold text-gray-700 mb-3">Income Categories</h4>
+          <h4 className="font-semibold text-gray-700 dark:text-gray-300 mb-3">Income Categories</h4>
           <div className="space-y-2">
             {incomeCategories.map((category) => (
               <div key={category.id}>
@@ -366,7 +366,7 @@ export default function SettingsView() {
 
         {/* Expense Categories */}
         <div>
-          <h4 className="font-semibold text-gray-700 mb-3">Expense Categories</h4>
+          <h4 className="font-semibold text-gray-700 dark:text-gray-300 mb-3">Expense Categories</h4>
           <div className="space-y-2">
             {expenseCategories.map((category) => (
               <div key={category.id}>
@@ -383,9 +383,9 @@ export default function SettingsView() {
       </div>
 
       {/* App Info */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold mb-4">About</h3>
-        <div className="space-y-2 text-sm text-gray-600">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h3 className="text-lg font-semibold mb-4 dark:text-white">About</h3>
+        <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
           <p><strong>Version:</strong> 1.0.0</p>
           <p><strong>Storage:</strong> Local (IndexedDB)</p>
           <p><strong>Offline:</strong> Fully supported</p>

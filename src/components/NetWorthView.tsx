@@ -203,8 +203,8 @@ export default function NetWorthView() {
 
       {/* Net Worth Trend Chart */}
       {chartData.length > 0 && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold mb-4">Net Worth History</h3>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold mb-4 dark:text-white">Net Worth History</h3>
           <div className="h-64 flex items-end gap-1">
             {chartData.map((snapshot) => {
               const height = ((snapshot.netWorth - minValue) / (maxValue - minValue)) * 100;
@@ -217,7 +217,7 @@ export default function NetWorthView() {
                     }`}
                     style={{ height: `${Math.max(height, 2)}%` }}
                   />
-                  <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                  <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
                     {format(new Date(snapshot.date), 'MMM d, yyyy')}
                     <br />
                     {formatCurrency(snapshot.netWorth)}
@@ -226,7 +226,7 @@ export default function NetWorthView() {
               );
             })}
           </div>
-          <div className="flex justify-between text-xs text-gray-500 mt-2">
+          <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-2">
             <span>{chartData.length > 0 ? format(new Date(chartData[0].date), 'MMM d') : ''}</span>
             <span>{chartData.length > 0 ? format(new Date(chartData[chartData.length - 1].date), 'MMM d') : ''}</span>
           </div>
@@ -235,12 +235,12 @@ export default function NetWorthView() {
 
       {/* Snapshot History */}
       {snapshots.length > 0 && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold mb-4">Snapshot History</h3>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold mb-4 dark:text-white">Snapshot History</h3>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b">
+                <tr className="border-b dark:border-gray-700">
                   <th className="text-left py-2 px-4">Date</th>
                   <th className="text-right py-2 px-4">Assets</th>
                   <th className="text-right py-2 px-4">Liabilities</th>
@@ -257,20 +257,20 @@ export default function NetWorthView() {
                     : 0;
 
                   return (
-                    <tr key={snapshot.id} className="border-b hover:bg-gray-50">
-                      <td className="py-3 px-4">{format(new Date(snapshot.date), 'MMM d, yyyy')}</td>
-                      <td className="text-right py-3 px-4 text-green-600">
+                    <tr key={snapshot.id} className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                      <td className="py-3 px-4 dark:text-gray-200">{format(new Date(snapshot.date), 'MMM d, yyyy')}</td>
+                      <td className="text-right py-3 px-4 text-green-600 dark:text-green-400">
                         {formatCurrency(snapshot.totalAssets)}
                       </td>
-                      <td className="text-right py-3 px-4 text-red-600">
+                      <td className="text-right py-3 px-4 text-red-600 dark:text-red-400">
                         {formatCurrency(snapshot.totalLiabilities)}
                       </td>
-                      <td className="text-right py-3 px-4 font-semibold">
+                      <td className="text-right py-3 px-4 font-semibold dark:text-gray-200">
                         {formatCurrency(snapshot.netWorth)}
                       </td>
                       <td className="text-right py-3 px-4">
                         {index < snapshots.length - 1 ? (
-                          <span className={change >= 0 ? 'text-green-600' : 'text-red-600'}>
+                          <span className={change >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
                             {change >= 0 ? '+' : ''}{formatCurrency(change)}
                             {' '}({changePercent >= 0 ? '+' : ''}{changePercent.toFixed(1)}%)
                           </span>

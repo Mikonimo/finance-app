@@ -250,23 +250,23 @@ export default function ReportsView() {
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-gray-600">Savings Rate</span>
-            <PieChart className="w-5 h-5 text-primary-600" />
+            <span className="text-sm text-gray-600 dark:text-gray-400">Savings Rate</span>
+            <PieChart className="w-5 h-5 text-primary-600 dark:text-primary-400" />
           </div>
-          <p className="text-2xl font-bold text-primary-600">{savingsRate.toFixed(1)}%</p>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-2xl font-bold text-primary-600 dark:text-primary-400">{savingsRate.toFixed(1)}%</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
             Of total income
           </p>
         </div>
       </div>
 
       {/* Top Expense Categories */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold mb-4">Top Expense Categories</h3>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h3 className="text-lg font-semibold mb-4 dark:text-white">Top Expense Categories</h3>
         {topCategories.length === 0 ? (
-          <p className="text-gray-500 text-center py-8">No expense data for this period</p>
+          <p className="text-gray-500 dark:text-gray-400 text-center py-8">No expense data for this period</p>
         ) : (
           <div className="space-y-4">
             {topCategories.map(category => {
@@ -307,8 +307,8 @@ export default function ReportsView() {
 
       {/* Income Sources */}
       {incomeBreakdown.length > 0 && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold mb-4">Income Sources</h3>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold mb-4 dark:text-white">Income Sources</h3>
           <div className="space-y-4">
             {incomeBreakdown.map(category => {
               const Icon = category.icon ? (LucideIcons as any)[category.icon] : null;
@@ -322,15 +322,15 @@ export default function ReportsView() {
                       >
                         {Icon ? <Icon className="w-4 h-4" /> : null}
                       </div>
-                      <span className="font-medium">{category.name}</span>
-                      <span className="text-sm text-gray-500">({category.count} transactions)</span>
+                      <span className="font-medium dark:text-gray-200">{category.name}</span>
+                      <span className="text-sm text-gray-500 dark:text-gray-400">({category.count} transactions)</span>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold">{formatCurrency(category.total)}</p>
-                      <p className="text-sm text-gray-500">{category.percentage.toFixed(1)}%</p>
+                      <p className="font-semibold dark:text-gray-200">{formatCurrency(category.total)}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{category.percentage.toFixed(1)}%</p>
                     </div>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                     <div
                       className="h-2 rounded-full transition-all"
                       style={{
@@ -348,12 +348,12 @@ export default function ReportsView() {
 
       {/* All Categories Breakdown */}
       {categoryBreakdown.length > 5 && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold mb-4">All Expense Categories</h3>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold mb-4 dark:text-white">All Expense Categories</h3>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b">
+                <tr className="border-b dark:border-gray-700">
                   <th className="text-left py-2 px-4">Category</th>
                   <th className="text-right py-2 px-4">Transactions</th>
                   <th className="text-right py-2 px-4">Total</th>
@@ -364,7 +364,7 @@ export default function ReportsView() {
                 {categoryBreakdown.map(category => {
                   const Icon = category.icon ? (LucideIcons as any)[category.icon] : null;
                   return (
-                    <tr key={category.id} className="border-b hover:bg-gray-50">
+                    <tr key={category.id} className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-2">
                           <div
@@ -373,12 +373,12 @@ export default function ReportsView() {
                           >
                             {Icon ? <Icon className="w-3 h-3" /> : null}
                           </div>
-                          <span>{category.name}</span>
+                          <span className="dark:text-gray-200">{category.name}</span>
                         </div>
                       </td>
-                      <td className="text-right py-3 px-4">{category.count}</td>
-                      <td className="text-right py-3 px-4 font-semibold">{formatCurrency(category.total)}</td>
-                      <td className="text-right py-3 px-4">{category.percentage.toFixed(1)}%</td>
+                      <td className="text-right py-3 px-4 dark:text-gray-200">{category.count}</td>
+                      <td className="text-right py-3 px-4 font-semibold dark:text-gray-200">{formatCurrency(category.total)}</td>
+                      <td className="text-right py-3 px-4 dark:text-gray-200">{category.percentage.toFixed(1)}%</td>
                     </tr>
                   );
                 })}

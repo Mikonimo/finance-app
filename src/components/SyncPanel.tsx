@@ -92,9 +92,16 @@ export default function SyncPanel() {
       localStorage.setItem('lastSyncTime', timestamp);
       setLastSync(timestamp);
 
+      // Count only active items for display
+      const activeAccountsCount = accounts.filter(a => a.isActive).length;
+      const activeCategoriesCount = categories.filter(c => c.isActive).length;
+      const activeTransactionsCount = transactions.filter(t => t.isActive !== false).length;
+      const activeRecurringCount = recurringTransactions.filter(r => r.isActive).length;
+      const totalActive = activeAccountsCount + activeCategoriesCount + activeTransactionsCount + budgets.length + activeRecurringCount + netWorthSnapshots.length;
+
       setSyncStatus({
         type: 'success',
-        message: `✅ Pushed ${result.inserted} new, updated ${result.updated} items`,
+        message: `✅ Synced ${totalActive} active items (${result.inserted} new, ${result.updated} updated)${result.errors?.length ? `, ${result.errors.length} errors` : ''}`,
       });
     } catch (error: any) {
       setSyncStatus({
@@ -338,6 +345,53 @@ export default function SyncPanel() {
     }
   };
 
+  // Cleanup old deleted records (older than 30 days)
+  const handleCleanupDeleted = async () => {
+    if (!confirm('This will permanently delete all records marked as deleted more than 30 days ago. Continue?')) {
+      return;
+    }
+
+    setSyncing(true);
+    setSyncStatus({ type: null, message: '' });
+
+    try {
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+      // Delete old inactive transactions
+      const oldInactiveTransactions = await db.transactions
+        .filter(t => t.isActive === false && t.createdAt < thirtyDaysAgo)
+        .toArray();
+      
+      for (const t of oldInactiveTransactions) {
+        await db.transactions.delete(t.id!);
+      }
+
+      // Delete old inactive accounts
+      const oldInactiveAccounts = await db.accounts
+        .filter(a => a.isActive === false && a.createdAt < thirtyDaysAgo)
+        .toArray();
+      
+      for (const a of oldInactiveAccounts) {
+        await db.accounts.delete(a.id!);
+      }
+
+      const totalCleaned = oldInactiveTransactions.length + oldInactiveAccounts.length;
+
+      setSyncStatus({
+        type: 'success',
+        message: `✅ Cleaned up ${totalCleaned} old deleted records`,
+      });
+    } catch (error: any) {
+      setSyncStatus({
+        type: 'error',
+        message: `❌ Cleanup failed: ${error.message}`,
+      });
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
@@ -416,6 +470,17 @@ export default function SyncPanel() {
           <p><strong>Push:</strong> Upload your local data to server</p>
           <p><strong>Full Sync:</strong> Pull first, then push</p>
           <p><strong>Pull All:</strong> Force download ALL data (use if sync not working)</p>
+        </div>
+
+        {/* Data Cleanup */}
+        <div className="pt-3 border-t">
+          <button
+            onClick={handleCleanupDeleted}
+            disabled={syncing}
+            className="text-sm text-red-600 hover:text-red-700 disabled:opacity-50"
+          >
+            🗑️ Clean up old deleted records (30+ days)
+          </button>
         </div>
 
         {/* Server Status */}

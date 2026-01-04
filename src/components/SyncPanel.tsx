@@ -48,6 +48,7 @@ export default function SyncPanel() {
         date: txn.date ? new Date(txn.date).toISOString() : new Date().toISOString(),
         createdAt: txn.createdAt ? new Date(txn.createdAt).toISOString() : new Date().toISOString(),
         isActive: txn.isActive !== 0 ? 1 : 0, // Ensure integer for SQLite (default to 1 if undefined)
+        tags: txn.tags ? JSON.stringify(txn.tags) : null, // Serialize array to JSON string for SQLite
       }));
 
       const formattedRecurring = recurringTransactions.map(rec => ({
@@ -57,6 +58,7 @@ export default function SyncPanel() {
         lastProcessed: rec.lastProcessed ? new Date(rec.lastProcessed).toISOString() : new Date().toISOString(),
         createdAt: rec.createdAt ? new Date(rec.createdAt).toISOString() : new Date().toISOString(),
         isActive: rec.isActive ? 1 : 0, // Convert boolean to integer for SQLite
+        tags: rec.tags ? JSON.stringify(rec.tags) : null, // Serialize array to JSON string for SQLite
       }));
 
       const formattedSnapshots = netWorthSnapshots.map(snap => ({
@@ -183,6 +185,7 @@ export default function SyncPanel() {
             ...transaction,
             date: new Date(transaction.date),
             createdAt: new Date(transaction.createdAt),
+            tags: transaction.tags ? (typeof transaction.tags === 'string' ? JSON.parse(transaction.tags) : transaction.tags) : undefined,
             // Keep isActive as integer (0 or 1) for consistency
           });
           imported++;
@@ -206,6 +209,7 @@ export default function SyncPanel() {
             endDate: recurring.endDate ? new Date(recurring.endDate) : undefined,
             lastProcessed: new Date(recurring.lastProcessed),
             createdAt: new Date(recurring.createdAt),
+            tags: recurring.tags ? (typeof recurring.tags === 'string' ? JSON.parse(recurring.tags) : recurring.tags) : undefined,
             // Keep isActive as integer (0 or 1) for Dexie queries
           });
           imported++;
@@ -295,6 +299,7 @@ export default function SyncPanel() {
             ...transaction,
             date: new Date(transaction.date),
             createdAt: new Date(transaction.createdAt),
+            tags: transaction.tags ? (typeof transaction.tags === 'string' ? JSON.parse(transaction.tags) : transaction.tags) : undefined,
           });
           imported++;
         }
@@ -315,6 +320,7 @@ export default function SyncPanel() {
             endDate: recurring.endDate ? new Date(recurring.endDate) : undefined,
             lastProcessed: new Date(recurring.lastProcessed),
             createdAt: new Date(recurring.createdAt),
+            tags: recurring.tags ? (typeof recurring.tags === 'string' ? JSON.parse(recurring.tags) : recurring.tags) : undefined,
           });
           imported++;
         }

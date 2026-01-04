@@ -40,12 +40,14 @@ export default function SyncPanel() {
       const formattedAccounts = accounts.map(acc => ({
         ...acc,
         createdAt: acc.createdAt ? new Date(acc.createdAt).toISOString() : new Date().toISOString(),
+        isActive: acc.isActive ? 1 : 0, // Convert boolean to integer for SQLite
       }));
 
       const formattedTransactions = transactions.map(txn => ({
         ...txn,
         date: txn.date ? new Date(txn.date).toISOString() : new Date().toISOString(),
         createdAt: txn.createdAt ? new Date(txn.createdAt).toISOString() : new Date().toISOString(),
+        isActive: txn.isActive !== false ? 1 : 0, // Convert boolean to integer for SQLite (default to 1 if undefined)
       }));
 
       const formattedRecurring = recurringTransactions.map(rec => ({
@@ -54,6 +56,7 @@ export default function SyncPanel() {
         endDate: rec.endDate ? new Date(rec.endDate).toISOString() : null,
         lastProcessed: rec.lastProcessed ? new Date(rec.lastProcessed).toISOString() : new Date().toISOString(),
         createdAt: rec.createdAt ? new Date(rec.createdAt).toISOString() : new Date().toISOString(),
+        isActive: rec.isActive ? 1 : 0, // Convert boolean to integer for SQLite
       }));
 
       const formattedSnapshots = netWorthSnapshots.map(snap => ({

@@ -47,7 +47,7 @@ export default function SyncPanel() {
         ...txn,
         date: txn.date ? new Date(txn.date).toISOString() : new Date().toISOString(),
         createdAt: txn.createdAt ? new Date(txn.createdAt).toISOString() : new Date().toISOString(),
-        isActive: txn.isActive !== false ? 1 : 0, // Convert boolean to integer for SQLite (default to 1 if undefined)
+        isActive: txn.isActive !== 0 ? 1 : 0, // Ensure integer for SQLite (default to 1 if undefined)
       }));
 
       const formattedRecurring = recurringTransactions.map(rec => ({
@@ -95,7 +95,7 @@ export default function SyncPanel() {
       // Count only active items for display
       const activeAccountsCount = accounts.filter(a => a.isActive).length;
       const activeCategoriesCount = categories.filter(c => c.isActive).length;
-      const activeTransactionsCount = transactions.filter(t => t.isActive !== false).length;
+      const activeTransactionsCount = transactions.filter(t => t.isActive !== 0).length;
       const activeRecurringCount = recurringTransactions.filter(r => r.isActive).length;
       const totalActive = activeAccountsCount + activeCategoriesCount + activeTransactionsCount + budgets.length + activeRecurringCount + netWorthSnapshots.length;
 
@@ -159,7 +159,7 @@ export default function SyncPanel() {
           await db.accounts.put({
             ...account,
             createdAt: new Date(account.createdAt),
-            isActive: account.isActive !== 0, // Convert from SQLite integer (0/1) to boolean
+            // Keep isActive as integer (0 or 1) for Dexie queries
           });
           imported++;
         }
@@ -170,7 +170,7 @@ export default function SyncPanel() {
         for (const category of serverData.categories) {
           await db.categories.put({
             ...category,
-            isActive: category.isActive !== 0, // Convert from SQLite integer (0/1) to boolean
+            // Keep isActive as integer (0 or 1) for Dexie queries
           });
           imported++;
         }
@@ -183,7 +183,7 @@ export default function SyncPanel() {
             ...transaction,
             date: new Date(transaction.date),
             createdAt: new Date(transaction.createdAt),
-            isActive: transaction.isActive !== 0, // Convert from SQLite integer (0/1) to boolean
+            // Keep isActive as integer (0 or 1) for consistency
           });
           imported++;
         }
@@ -206,7 +206,7 @@ export default function SyncPanel() {
             endDate: recurring.endDate ? new Date(recurring.endDate) : undefined,
             lastProcessed: new Date(recurring.lastProcessed),
             createdAt: new Date(recurring.createdAt),
-            isActive: recurring.isActive !== 0, // Convert from SQLite integer (0/1) to boolean
+            // Keep isActive as integer (0 or 1) for Dexie queries
           });
           imported++;
         }
@@ -277,7 +277,6 @@ export default function SyncPanel() {
           await db.accounts.put({
             ...account,
             createdAt: new Date(account.createdAt),
-            isActive: account.isActive !== 0,
           });
           imported++;
         }
@@ -285,10 +284,7 @@ export default function SyncPanel() {
 
       if (serverData.categories?.length > 0) {
         for (const category of serverData.categories) {
-          await db.categories.put({
-            ...category,
-            isActive: category.isActive !== 0,
-          });
+          await db.categories.put(category);
           imported++;
         }
       }
@@ -299,7 +295,6 @@ export default function SyncPanel() {
             ...transaction,
             date: new Date(transaction.date),
             createdAt: new Date(transaction.createdAt),
-            isActive: transaction.isActive !== 0,
           });
           imported++;
         }
@@ -320,7 +315,6 @@ export default function SyncPanel() {
             endDate: recurring.endDate ? new Date(recurring.endDate) : undefined,
             lastProcessed: new Date(recurring.lastProcessed),
             createdAt: new Date(recurring.createdAt),
-            isActive: recurring.isActive !== 0,
           });
           imported++;
         }
@@ -372,7 +366,7 @@ export default function SyncPanel() {
 
       // Delete old inactive transactions
       const oldInactiveTransactions = await db.transactions
-        .filter(t => t.isActive === false && t.createdAt < thirtyDaysAgo)
+        .filter(t => t.isActive === 0 && t.createdAt < thirtyDaysAgo)
         .toArray();
       
       for (const t of oldInactiveTransactions) {
@@ -381,7 +375,7 @@ export default function SyncPanel() {
 
       // Delete old inactive accounts
       const oldInactiveAccounts = await db.accounts
-        .filter(a => a.isActive === false && a.createdAt < thirtyDaysAgo)
+        .filter(a => a.isActive === 0 && a.createdAt < thirtyDaysAgo)
         .toArray();
       
       for (const a of oldInactiveAccounts) {

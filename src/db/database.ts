@@ -8,7 +8,7 @@ export interface Account {
   balance: number;
   color: string;
   createdAt: Date;
-  isActive: boolean;
+  isActive: number; // 0 = deleted, 1 = active (stored as INTEGER for SQLite compatibility)
 }
 
 export interface Transaction {
@@ -24,7 +24,7 @@ export interface Transaction {
   tags?: string[];
   notes?: string;
   createdAt: Date;
-  isActive?: boolean; // For soft deletes
+  isActive?: number; // 0 = deleted, 1 = active (stored as INTEGER for SQLite compatibility)
 }
 
 export interface Category {
@@ -35,7 +35,7 @@ export interface Category {
   icon?: string;
   monthlyBudget?: number;
   parentCategoryId?: number | null;
-  isActive: boolean;
+  isActive: number; // 0 = deleted, 1 = active (stored as INTEGER for SQLite compatibility)
 }
 
 export interface Budget {
@@ -60,7 +60,7 @@ export interface RecurringTransaction {
   payee?: string;
   tags?: string[];
   notes?: string;
-  isActive: boolean;
+  isActive: number; // 0 = deleted, 1 = active (stored as INTEGER for SQLite compatibility)
   createdAt: Date;
 }
 

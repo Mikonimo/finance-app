@@ -18,7 +18,7 @@ export default function BudgetsView() {
   );
 
   const transactions = useLiveQuery(
-    () => db.transactions.filter(t => t.isActive !== false).toArray(),
+    () => db.transactions.filter(t => t.isActive !== 0).toArray(),
     []
   );
 

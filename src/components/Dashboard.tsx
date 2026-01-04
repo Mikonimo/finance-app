@@ -21,7 +21,7 @@ export default function Dashboard() {
   const [customEndDate, setCustomEndDate] = useState(format(endOfMonth(new Date()), 'yyyy-MM-dd'));
 
   const transactions = useLiveQuery(
-    () => db.transactions.filter(t => t.isActive !== false).toArray(),
+    () => db.transactions.filter(t => t.isActive !== 0).toArray(),
     []
   );
 

@@ -349,8 +349,8 @@ export default function SyncPanel() {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 dark:text-white">
         <RefreshCw className="w-5 h-5" />
         Sync with Server
       </h3>
@@ -361,8 +361,8 @@ export default function SyncPanel() {
           <div
             className={`p-3 rounded-lg flex items-start gap-2 ${
               syncStatus.type === 'success'
-                ? 'bg-green-50 text-green-800'
-                : 'bg-red-50 text-red-800'
+                ? 'bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-300'
+                : 'bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-300'
             }`}
           >
             {syncStatus.type === 'success' ? (
@@ -376,7 +376,7 @@ export default function SyncPanel() {
 
         {/* Last Sync Time */}
         {lastSync && (
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-gray-600 dark:text-gray-400">
             Last synced: {new Date(lastSync).toLocaleString()}
           </div>
         )}
@@ -386,7 +386,7 @@ export default function SyncPanel() {
           <button
             onClick={handlePullFromServer}
             disabled={syncing}
-            className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-blue-600 dark:border-blue-500 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Download className="w-5 h-5" />
             <span>Pull</span>
@@ -395,7 +395,7 @@ export default function SyncPanel() {
           <button
             onClick={handlePushToServer}
             disabled={syncing}
-            className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-green-600 text-green-600 rounded-lg hover:bg-green-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-green-600 dark:border-green-500 text-green-600 dark:text-green-400 rounded-lg hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Upload className="w-5 h-5" />
             <span>Push</span>
@@ -404,7 +404,7 @@ export default function SyncPanel() {
           <button
             onClick={handleFullSync}
             disabled={syncing}
-            className="flex items-center justify-center gap-2 px-4 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center justify-center gap-2 px-4 py-3 bg-primary-600 dark:bg-primary-500 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <RefreshCw className={`w-5 h-5 ${syncing ? 'animate-spin' : ''}`} />
             <span>Full Sync</span>
@@ -413,7 +413,7 @@ export default function SyncPanel() {
           <button
             onClick={handleForceFullPull}
             disabled={syncing}
-            className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-purple-600 text-purple-600 rounded-lg hover:bg-purple-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-purple-600 dark:border-purple-500 text-purple-600 dark:text-purple-400 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Download className="w-5 h-5" />
             <span>Pull All</span>
@@ -421,7 +421,7 @@ export default function SyncPanel() {
         </div>
 
         {/* Description */}
-        <div className="text-xs text-gray-500 space-y-1 pt-2 border-t">
+        <div className="text-xs text-gray-500 dark:text-gray-400 space-y-1 pt-2 border-t dark:border-gray-700">
           <p><strong>Pull:</strong> Download changes from server</p>
           <p><strong>Push:</strong> Upload your local data to server</p>
           <p><strong>Full Sync:</strong> Pull first, then push</p>
@@ -429,9 +429,9 @@ export default function SyncPanel() {
         </div>
 
         {/* Server Status */}
-        <div className="pt-2 border-t">
-          <p className="text-xs text-gray-500">
-            Server: <code className="bg-gray-100 px-1 rounded">
+        <div className="pt-2 border-t dark:border-gray-700">
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            Server: <code className="bg-gray-100 dark:bg-gray-700 px-1 rounded dark:text-gray-200">
               {window.location.hostname === 'localhost' 
                 ? 'http://localhost:3005' 
                 : `http://${window.location.hostname}:3005`}

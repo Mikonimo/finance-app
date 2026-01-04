@@ -90,12 +90,26 @@ export default function SyncPanel() {
       // Check if local database has any data
       const localAccountCount = await db.accounts.count();
       const localCategoryCount = await db.categories.count();
+      const localTransactionCount = await db.transactions.count();
       
-      // If database is empty, pull everything (ignore lastSyncTime)
+      console.log('📊 Local data count:', { 
+        accounts: localAccountCount, 
+        categories: localCategoryCount,
+        transactions: localTransactionCount
+      });
+      
+      // If database is mostly empty, do a full pull (ignore lastSyncTime)
       // Otherwise use lastSyncTime to get only changes since last sync
-      const lastSyncTime = (localAccountCount === 0 && localCategoryCount === 0) 
+      const isEmptyDatabase = localAccountCount < 2 && localCategoryCount < 5;
+      const lastSyncTime = isEmptyDatabase 
         ? undefined 
         : localStorage.getItem('lastSyncTime') || undefined;
+      
+      console.log('🔍 Pull strategy:', { 
+        isEmptyDatabase, 
+        usingTimestamp: lastSyncTime ? 'YES' : 'NO (full sync)',
+        timestamp: lastSyncTime 
+      });
       
       const serverData = await api.sync.pull(lastSyncTime);
       
@@ -200,6 +214,105 @@ export default function SyncPanel() {
     }, 1000);
   };
 
+  // Force full pull (ignore lastSyncTime)
+  const handleForceFullPull = async () => {
+    setSyncing(true);
+    setSyncStatus({ type: null, message: '' });
+
+    try {
+      console.log('🔄 Force full pull - clearing lastSyncTime');
+      localStorage.removeItem('lastSyncTime');
+      
+      const serverData = await api.sync.pull(undefined);
+      
+      console.log('📥 Server data received:', {
+        accounts: serverData.accounts?.length || 0,
+        categories: serverData.categories?.length || 0,
+        transactions: serverData.transactions?.length || 0,
+      });
+
+      let imported = 0;
+
+      // Import all data using put() for upsert
+      if (serverData.accounts?.length > 0) {
+        for (const account of serverData.accounts) {
+          await db.accounts.put({
+            ...account,
+            createdAt: new Date(account.createdAt),
+          });
+          imported++;
+        }
+      }
+
+      if (serverData.categories?.length > 0) {
+        for (const category of serverData.categories) {
+          await db.categories.put(category);
+          imported++;
+        }
+      }
+
+      if (serverData.transactions?.length > 0) {
+        for (const transaction of serverData.transactions) {
+          await db.transactions.put({
+            ...transaction,
+            date: new Date(transaction.date),
+            createdAt: new Date(transaction.createdAt),
+          });
+          imported++;
+        }
+      }
+
+      if (serverData.budgets?.length > 0) {
+        for (const budget of serverData.budgets) {
+          await db.budgets.put(budget);
+          imported++;
+        }
+      }
+
+      if (serverData.recurringTransactions?.length > 0) {
+        for (const recurring of serverData.recurringTransactions) {
+          await db.recurringTransactions.put({
+            ...recurring,
+            startDate: new Date(recurring.startDate),
+            endDate: recurring.endDate ? new Date(recurring.endDate) : undefined,
+            lastProcessed: new Date(recurring.lastProcessed),
+            createdAt: new Date(recurring.createdAt),
+          });
+          imported++;
+        }
+      }
+
+      if (serverData.netWorthSnapshots?.length > 0) {
+        for (const snapshot of serverData.netWorthSnapshots) {
+          await db.netWorthSnapshots.put({
+            ...snapshot,
+            date: new Date(snapshot.date),
+            createdAt: new Date(snapshot.createdAt),
+          });
+          imported++;
+        }
+      }
+
+      const timestamp = serverData.timestamp || new Date().toISOString();
+      localStorage.setItem('lastSyncTime', timestamp);
+      setLastSync(timestamp);
+
+      console.log('✅ Force pull completed:', { imported, timestamp });
+
+      setSyncStatus({
+        type: 'success',
+        message: `✅ Force pulled ALL data: ${imported} items imported`,
+      });
+    } catch (error: any) {
+      setSyncStatus({
+        type: 'error',
+        message: `❌ Force pull failed: ${error.message}`,
+      });
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
@@ -234,14 +347,14 @@ export default function SyncPanel() {
         )}
 
         {/* Sync Buttons */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <button
             onClick={handlePullFromServer}
             disabled={syncing}
             className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Download className="w-5 h-5" />
-            <span>Pull from Server</span>
+            <span>Pull</span>
           </button>
 
           <button
@@ -250,7 +363,7 @@ export default function SyncPanel() {
             className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-green-600 text-green-600 rounded-lg hover:bg-green-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Upload className="w-5 h-5" />
-            <span>Push to Server</span>
+            <span>Push</span>
           </button>
 
           <button
@@ -261,13 +374,23 @@ export default function SyncPanel() {
             <RefreshCw className={`w-5 h-5 ${syncing ? 'animate-spin' : ''}`} />
             <span>Full Sync</span>
           </button>
+
+          <button
+            onClick={handleForceFullPull}
+            disabled={syncing}
+            className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-purple-600 text-purple-600 rounded-lg hover:bg-purple-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Download className="w-5 h-5" />
+            <span>Pull All</span>
+          </button>
         </div>
 
         {/* Description */}
         <div className="text-xs text-gray-500 space-y-1 pt-2 border-t">
-          <p><strong>Pull:</strong> Download data from server to this device</p>
+          <p><strong>Pull:</strong> Download changes from server</p>
           <p><strong>Push:</strong> Upload your local data to server</p>
-          <p><strong>Full Sync:</strong> Pull first, then push (recommended)</p>
+          <p><strong>Full Sync:</strong> Pull first, then push</p>
+          <p><strong>Pull All:</strong> Force download ALL data (use if sync not working)</p>
         </div>
 
         {/* Server Status */}

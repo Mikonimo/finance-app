@@ -27,6 +27,15 @@ export default function SyncPanel() {
       const recurringTransactions = await db.recurringTransactions.toArray();
       const netWorthSnapshots = await db.netWorthSnapshots.toArray();
 
+      console.log('📤 Preparing to push:', {
+        accounts: accounts.length,
+        categories: categories.length,
+        transactions: transactions.length,
+        budgets: budgets.length,
+        recurringTransactions: recurringTransactions.length,
+        netWorthSnapshots: netWorthSnapshots.length,
+      });
+
       // Convert dates to ISO strings for API
       const formattedAccounts = accounts.map(acc => ({
         ...acc,
@@ -62,6 +71,8 @@ export default function SyncPanel() {
         recurringTransactions: formattedRecurring,
         netWorthSnapshots: formattedSnapshots,
       });
+
+      console.log('✅ Push result:', result);
 
       const timestamp = new Date().toISOString();
       localStorage.setItem('lastSyncTime', timestamp);

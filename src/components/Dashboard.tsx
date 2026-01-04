@@ -21,12 +21,12 @@ export default function Dashboard() {
   const [customEndDate, setCustomEndDate] = useState(format(endOfMonth(new Date()), 'yyyy-MM-dd'));
 
   const transactions = useLiveQuery(
-    () => db.transactions.toArray(),
+    () => db.transactions.filter(t => t.isActive !== false).toArray(),
     []
   );
 
   const categories = useLiveQuery(
-    () => db.categories.toArray(),
+    () => db.categories.where('isActive').equals(1).toArray(),
     []
   );
 

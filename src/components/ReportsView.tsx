@@ -12,17 +12,17 @@ export default function ReportsView() {
   const [customEndDate, setCustomEndDate] = useState('');
 
   const transactions = useLiveQuery(
-    () => db.transactions.toArray(),
+    () => db.transactions.filter(t => t.isActive !== false).toArray(),
     []
   );
 
   const categories = useLiveQuery(
-    () => db.categories.toArray(),
+    () => db.categories.where('isActive').equals(1).toArray(),
     []
   );
 
   const accounts = useLiveQuery(
-    () => db.accounts.toArray(),
+    () => db.accounts.where('isActive').equals(1).toArray(),
     []
   );
 

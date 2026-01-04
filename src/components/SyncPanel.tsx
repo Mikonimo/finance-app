@@ -87,9 +87,17 @@ export default function SyncPanel() {
     setSyncStatus({ type: null, message: '' });
 
     try {
-      // Get data from server
-      const lastSyncTime = localStorage.getItem('lastSyncTime');
-      const serverData = await api.sync.pull(lastSyncTime || undefined);
+      // Check if local database has any data
+      const localAccountCount = await db.accounts.count();
+      const localCategoryCount = await db.categories.count();
+      
+      // If database is empty, pull everything (ignore lastSyncTime)
+      // Otherwise use lastSyncTime to get only changes since last sync
+      const lastSyncTime = (localAccountCount === 0 && localCategoryCount === 0) 
+        ? undefined 
+        : localStorage.getItem('lastSyncTime') || undefined;
+      
+      const serverData = await api.sync.pull(lastSyncTime);
 
       let imported = 0;
 

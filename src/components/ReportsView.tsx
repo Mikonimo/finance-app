@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../db/database';
+import { db, isActive } from '../db/database';
 import { Download, TrendingUp, PieChart, BarChart3, Calendar } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { formatCurrency } from '../utils/finance';
+import { PageSkeleton } from './LoadingSkeleton';
 import { format, startOfMonth, endOfMonth, subMonths, startOfYear, endOfYear } from 'date-fns';
 
 export default function ReportsView() {
@@ -12,26 +13,26 @@ export default function ReportsView() {
   const [customEndDate, setCustomEndDate] = useState('');
 
   const transactions = useLiveQuery(
-    () => db.transactions.filter(t => t.isActive !== false && (t.isActive as any) !== 0).toArray(),
+    () => db.transactions.filter(t => isActive(t.isActive as any)).toArray(),
     []
   );
 
   const categories = useLiveQuery(
-    () => db.categories.filter(c => c.isActive === true || (c.isActive as any) === 1).toArray(),
+    () => db.categories.filter(c => isActive(c.isActive as any)).toArray(),
     []
   );
 
   const accounts = useLiveQuery(
-    () => db.accounts.filter(a => a.isActive === true || (a.isActive as any) === 1).toArray(),
+    () => db.accounts.filter(a => isActive(a.isActive as any)).toArray(),
     []
   );
 
   if (!transactions || !categories || !accounts) {
-    return <div className="p-4">Loading...</div>;
+    return <PageSkeleton />;
   }
 
   // Calculate date range
-  const getDateRange = () => {
+  const { start, end } = useMemo(() => {
     const today = new Date();
     switch (dateRange) {
       case 'this-month':
@@ -53,67 +54,75 @@ export default function ReportsView() {
       default:
         return { start: startOfMonth(today), end: endOfMonth(today) };
     }
-  };
-
-  const { start, end } = getDateRange();
+  }, [dateRange, customStartDate, customEndDate]);
 
   // Filter transactions by date range
-  const filteredTransactions = transactions.filter(t => {
-    const txDate = new Date(t.date);
-    return txDate >= start && txDate <= end && t.type !== 'transfer';
-  });
+  const filteredTransactions = useMemo(
+    () => transactions.filter(t => {
+      const txDate = new Date(t.date);
+      return txDate >= start && txDate <= end && t.type !== 'transfer';
+    }),
+    [transactions, start, end]
+  );
 
-  // Calculate totals
-  const totalIncome = filteredTransactions
-    .filter(t => t.type === 'income')
-    .reduce((sum, t) => sum + t.amount, 0);
+  // Calculate totals and breakdowns in a single pass
+  const { totalIncome, totalExpenses, netSavings, savingsRate, categoryBreakdown, topCategories, incomeBreakdown } = useMemo(() => {
+    let income = 0;
+    let expenses = 0;
 
-  const totalExpenses = filteredTransactions
-    .filter(t => t.type === 'expense')
-    .reduce((sum, t) => sum + t.amount, 0);
+    // Aggregate amounts by categoryId in a single pass
+    const expenseByCat = new Map<number, { total: number; count: number }>();
+    const incomeByCat = new Map<number, { total: number; count: number }>();
 
-  const netSavings = totalIncome - totalExpenses;
-  const savingsRate = totalIncome > 0 ? (netSavings / totalIncome) * 100 : 0;
+    for (const t of filteredTransactions) {
+      if (t.type === 'income') {
+        income += t.amount;
+        const entry = incomeByCat.get(t.categoryId) || { total: 0, count: 0 };
+        entry.total += t.amount;
+        entry.count++;
+        incomeByCat.set(t.categoryId, entry);
+      } else if (t.type === 'expense') {
+        expenses += t.amount;
+        const entry = expenseByCat.get(t.categoryId) || { total: 0, count: 0 };
+        entry.total += t.amount;
+        entry.count++;
+        expenseByCat.set(t.categoryId, entry);
+      }
+    }
 
-  // Category breakdown
-  const categoryBreakdown = categories
-    .filter(c => c.type === 'expense' && c.isActive)
-    .map(category => {
-      const categoryTransactions = filteredTransactions.filter(
-        t => t.categoryId === category.id && t.type === 'expense'
-      );
-      const total = categoryTransactions.reduce((sum, t) => sum + t.amount, 0);
-      const percentage = totalExpenses > 0 ? (total / totalExpenses) * 100 : 0;
-      return {
-        ...category,
-        total,
-        percentage,
-        count: categoryTransactions.length
-      };
-    })
-    .filter(c => c.total > 0)
-    .sort((a, b) => b.total - a.total);
+    const net = income - expenses;
+    const rate = income > 0 ? (net / income) * 100 : 0;
 
-  const topCategories = categoryBreakdown.slice(0, 5);
+    const expenseBreakdown = categories
+      .filter(c => c.type === 'expense' && c.isActive)
+      .map(category => {
+        const entry = expenseByCat.get(category.id!) || { total: 0, count: 0 };
+        const percentage = expenses > 0 ? (entry.total / expenses) * 100 : 0;
+        return { ...category, total: entry.total, percentage, count: entry.count };
+      })
+      .filter(c => c.total > 0)
+      .sort((a, b) => b.total - a.total);
 
-  // Income category breakdown
-  const incomeBreakdown = categories
-    .filter(c => c.type === 'income' && c.isActive)
-    .map(category => {
-      const categoryTransactions = filteredTransactions.filter(
-        t => t.categoryId === category.id && t.type === 'income'
-      );
-      const total = categoryTransactions.reduce((sum, t) => sum + t.amount, 0);
-      const percentage = totalIncome > 0 ? (total / totalIncome) * 100 : 0;
-      return {
-        ...category,
-        total,
-        percentage,
-        count: categoryTransactions.length
-      };
-    })
-    .filter(c => c.total > 0)
-    .sort((a, b) => b.total - a.total);
+    const incBreakdown = categories
+      .filter(c => c.type === 'income' && c.isActive)
+      .map(category => {
+        const entry = incomeByCat.get(category.id!) || { total: 0, count: 0 };
+        const percentage = income > 0 ? (entry.total / income) * 100 : 0;
+        return { ...category, total: entry.total, percentage, count: entry.count };
+      })
+      .filter(c => c.total > 0)
+      .sort((a, b) => b.total - a.total);
+
+    return {
+      totalIncome: income,
+      totalExpenses: expenses,
+      netSavings: net,
+      savingsRate: rate,
+      categoryBreakdown: expenseBreakdown,
+      topCategories: expenseBreakdown.slice(0, 5),
+      incomeBreakdown: incBreakdown,
+    };
+  }, [filteredTransactions, categories]);
 
   // Export to CSV
   const handleExportCSV = () => {

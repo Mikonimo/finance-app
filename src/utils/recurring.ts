@@ -1,4 +1,4 @@
-import { db } from '../db/database';
+import { db, isActive } from '../db/database';
 import { addDays, addWeeks, addMonths, addYears, isAfter, isBefore, startOfDay } from 'date-fns';
 
 export async function processRecurringTransactions() {
@@ -6,7 +6,7 @@ export async function processRecurringTransactions() {
   
   // Get all active recurring transactions
   const recurringTransactions = await db.recurringTransactions
-    .where('isActive').equals(1)
+    .filter(r => isActive(r.isActive as any))
     .toArray();
 
   for (const recurring of recurringTransactions) {

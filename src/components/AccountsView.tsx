@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db, Account } from '../db/database';
+import { db, Account, isActive } from '../db/database';
+import { PageSkeleton } from './LoadingSkeleton';
 import { Plus, Edit2, Trash2 } from 'lucide-react';
 import { formatCurrency } from '../utils/finance';
 import Modal from './Modal';
@@ -11,22 +12,22 @@ export default function AccountsView() {
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
 
   const accounts = useLiveQuery(
-    () => db.accounts.filter(a => a.isActive === true || (a.isActive as any) === 1).toArray(),
+    () => db.accounts.filter(a => isActive(a.isActive as any)).toArray(),
     []
   );
 
   const transactions = useLiveQuery(
-    () => db.transactions.filter(t => t.isActive !== false && (t.isActive as any) !== 0).toArray(),
+    () => db.transactions.filter(t => isActive(t.isActive as any)).toArray(),
     []
   );
 
   if (!accounts || !transactions) {
-    return <div className="p-4">Loading...</div>;
+    return <PageSkeleton />;
   }
 
   const handleDelete = async (id: number) => {
     if (confirm('Are you sure you want to delete this account?')) {
-      await db.accounts.update(id, { isActive: 0 as any });
+      await db.accounts.update(id, { isActive: false });
     }
   };
 

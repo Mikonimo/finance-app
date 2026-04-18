@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../db/database';
+import { db, isActive } from '../db/database';
 import { TrendingUp, TrendingDown, Wallet, CreditCard, LineChart, RefreshCw } from 'lucide-react';
 import { formatCurrency } from '../utils/finance';
+import { PageSkeleton } from './LoadingSkeleton';
 import { calculateNetWorth, takeNetWorthSnapshot } from '../utils/networth';
 import { format } from 'date-fns';
 
@@ -15,12 +16,12 @@ export default function NetWorthView() {
   } | null>(null);
 
   const accounts = useLiveQuery(
-    () => db.accounts.filter(a => a.isActive === true || (a.isActive as any) === 1).toArray(),
+    () => db.accounts.filter(a => isActive(a.isActive as any)).toArray(),
     []
   );
 
   const transactions = useLiveQuery(
-    () => db.transactions.filter(t => t.isActive !== false && (t.isActive as any) !== 0).toArray(),
+    () => db.transactions.filter(t => isActive(t.isActive as any)).toArray(),
     []
   );
 
@@ -38,7 +39,7 @@ export default function NetWorthView() {
   }, [accounts, transactions]);
 
   if (!accounts || !transactions || !snapshots || !currentNetWorth) {
-    return <div className="p-4">Loading...</div>;
+    return <PageSkeleton />;
   }
 
   const handleTakeSnapshot = async () => {

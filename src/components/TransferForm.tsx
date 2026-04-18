@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../db/database';
+import { db, isActive } from '../db/database';
+import { toast } from './Toast';
 import { format } from 'date-fns';
 
 interface TransferFormProps {
@@ -18,7 +19,7 @@ export default function TransferForm({ onClose }: TransferFormProps) {
   });
 
   const accounts = useLiveQuery(
-    () => db.accounts.where('isActive').equals(1).toArray(),
+    () => db.accounts.filter(a => isActive(a.isActive as any)).toArray(),
     []
   );
 
@@ -27,28 +28,33 @@ export default function TransferForm({ onClose }: TransferFormProps) {
   }
 
   // Set default accounts if not set
-  if (formData.fromAccountId === 0 && accounts.length > 0) {
-    setFormData({ ...formData, fromAccountId: accounts[0].id! });
-  }
-  if (formData.toAccountId === 0 && accounts.length > 1) {
-    setFormData({ ...formData, toAccountId: accounts[1].id! });
-  }
+  useEffect(() => {
+    if (formData.fromAccountId === 0 && accounts && accounts.length > 0) {
+      setFormData(prev => ({ ...prev, fromAccountId: accounts[0].id! }));
+    }
+  }, [accounts, formData.fromAccountId]);
+
+  useEffect(() => {
+    if (formData.toAccountId === 0 && accounts && accounts.length > 1) {
+      setFormData(prev => ({ ...prev, toAccountId: accounts[1].id! }));
+    }
+  }, [accounts, formData.toAccountId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (formData.amount <= 0) {
-      alert('Amount must be greater than 0');
+      toast.warning('Amount must be greater than 0');
       return;
     }
 
     if (formData.fromAccountId === 0 || formData.toAccountId === 0) {
-      alert('Please select both accounts');
+      toast.warning('Please select both accounts');
       return;
     }
 
     if (formData.fromAccountId === formData.toAccountId) {
-      alert('Source and destination accounts must be different');
+      toast.warning('Source and destination accounts must be different');
       return;
     }
 
@@ -73,13 +79,13 @@ export default function TransferForm({ onClose }: TransferFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           From Account
         </label>
         <select
           value={formData.fromAccountId}
           onChange={(e) => setFormData({ ...formData, fromAccountId: parseInt(e.target.value) })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
           required
         >
           <option value={0}>Select account</option>
@@ -100,13 +106,13 @@ export default function TransferForm({ onClose }: TransferFormProps) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           To Account
         </label>
         <select
           value={formData.toAccountId}
           onChange={(e) => setFormData({ ...formData, toAccountId: parseInt(e.target.value) })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
           required
         >
           <option value={0}>Select account</option>
@@ -119,7 +125,7 @@ export default function TransferForm({ onClose }: TransferFormProps) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Amount
         </label>
         <input
@@ -127,47 +133,47 @@ export default function TransferForm({ onClose }: TransferFormProps) {
           step="0.01"
           value={formData.amount || ''}
           onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) || 0 })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
           placeholder="0.00"
           required
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Description
         </label>
         <input
           type="text"
           value={formData.description}
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
           placeholder="e.g., Transfer to savings"
           required
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Date
         </label>
         <input
           type="date"
           value={formData.date}
           onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
           required
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Notes (optional)
         </label>
         <textarea
           value={formData.notes}
           onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
           placeholder="Additional notes..."
           rows={2}
         />
@@ -177,7 +183,7 @@ export default function TransferForm({ onClose }: TransferFormProps) {
         <button
           type="button"
           onClick={onClose}
-          className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors dark:text-gray-200"
         >
           Cancel
         </button>

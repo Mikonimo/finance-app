@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, Category, RecurringTransaction } from '../db/database';
-import { Download, Upload, Plus, Edit2, Trash2, Info, Repeat, BarChart3, TrendingUp } from 'lucide-react';
+import { Download, Upload, Plus, Edit2, Trash2, Info, Repeat, BarChart3, TrendingUp, Sun, Moon, Monitor } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import Modal from './Modal';
 import CategoryForm from './CategoryForm';
 import RecurringTransactionForm from './RecurringTransactionForm';
 import SyncPanel from './SyncPanel';
+import { PageSkeleton } from './LoadingSkeleton';
+import { toast } from './Toast';
 import { formatCurrency } from '../utils/finance';
 import { useAppStore } from '../store/appStore';
 
@@ -15,7 +17,7 @@ export default function SettingsView() {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [showRecurringModal, setShowRecurringModal] = useState(false);
   const [editingRecurring, setEditingRecurring] = useState<RecurringTransaction | null>(null);
-  const { setCurrentView } = useAppStore();
+  const { setCurrentView, theme, setTheme } = useAppStore();
 
   const categories = useLiveQuery(
     () => db.categories.toArray(),
@@ -33,7 +35,7 @@ export default function SettingsView() {
   );
 
   if (!categories || !recurringTransactions || !accounts) {
-    return <div className="p-4">Loading...</div>;
+    return <PageSkeleton />;
   }
 
   const handleExportData = async () => {
@@ -60,10 +62,10 @@ export default function SettingsView() {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      alert('Data exported successfully!');
+      toast.success('Data exported successfully!');
     } catch (error) {
       console.error('Export failed:', error);
-      alert('Failed to export data');
+      toast.error('Failed to export data');
     }
   };
 
@@ -95,11 +97,11 @@ export default function SettingsView() {
       await db.transactions.bulkAdd(data.transactions);
       await db.categories.bulkAdd(data.categories);
 
-      alert('Data imported successfully!');
-      window.location.reload();
+      toast.success('Data imported successfully! Reloading...');
+      setTimeout(() => window.location.reload(), 1500);
     } catch (error) {
       console.error('Import failed:', error);
-      alert('Failed to import data. Please check the file format.');
+      toast.error('Failed to import data. Please check the file format.');
     }
   };
 
@@ -112,7 +114,7 @@ export default function SettingsView() {
       }
     }
 
-    await db.categories.update(id, { isActive: 0 as any });
+    await db.categories.update(id, { isActive: false });
   };
 
   const handleEditCategory = (category: Category) => {
@@ -213,6 +215,46 @@ export default function SettingsView() {
           >
             <TrendingUp className="w-5 h-5 text-green-600 dark:text-green-400" />
             <span className="font-medium">Net Worth</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Appearance */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+        <h3 className="text-lg font-semibold mb-3 dark:text-white">Appearance</h3>
+        <div className="grid grid-cols-3 gap-2">
+          <button
+            onClick={() => setTheme('light')}
+            className={`flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-colors ${
+              theme === 'light'
+                ? 'border-primary-600 dark:border-primary-500 bg-primary-50 dark:bg-primary-900/20'
+                : 'border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+            }`}
+          >
+            <Sun className={`w-6 h-6 ${theme === 'light' ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400'}`} />
+            <span className={`text-sm font-medium ${theme === 'light' ? 'text-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400'}`}>Light</span>
+          </button>
+          <button
+            onClick={() => setTheme('dark')}
+            className={`flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-colors ${
+              theme === 'dark'
+                ? 'border-primary-600 dark:border-primary-500 bg-primary-50 dark:bg-primary-900/20'
+                : 'border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+            }`}
+          >
+            <Moon className={`w-6 h-6 ${theme === 'dark' ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400'}`} />
+            <span className={`text-sm font-medium ${theme === 'dark' ? 'text-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400'}`}>Dark</span>
+          </button>
+          <button
+            onClick={() => setTheme('system')}
+            className={`flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-colors ${
+              theme === 'system'
+                ? 'border-primary-600 dark:border-primary-500 bg-primary-50 dark:bg-primary-900/20'
+                : 'border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+            }`}
+          >
+            <Monitor className={`w-6 h-6 ${theme === 'system' ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400'}`} />
+            <span className={`text-sm font-medium ${theme === 'system' ? 'text-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400'}`}>System</span>
           </button>
         </div>
       </div>

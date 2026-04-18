@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../db/database';
+import { db, isActive } from '../db/database';
+import { PageSkeleton } from './LoadingSkeleton';
 import { useAppStore } from '../store/appStore';
 import {
   formatCurrency,
@@ -13,17 +14,17 @@ export default function BudgetsView() {
   const { selectedMonth, setSelectedMonth } = useAppStore();
 
   const categories = useLiveQuery(
-    () => db.categories.filter(c => c.isActive === true || (c.isActive as any) === 1).toArray(),
+    () => db.categories.filter(c => isActive(c.isActive as any)).toArray(),
     []
   );
 
   const transactions = useLiveQuery(
-    () => db.transactions.filter(t => t.isActive !== false && (t.isActive as any) !== 0).toArray(),
+    () => db.transactions.filter(t => isActive(t.isActive as any)).toArray(),
     []
   );
 
   if (!categories || !transactions) {
-    return <div className="p-4">Loading...</div>;
+    return <PageSkeleton />;
   }
 
   const monthTransactions = filterTransactionsByMonth(transactions, selectedMonth);

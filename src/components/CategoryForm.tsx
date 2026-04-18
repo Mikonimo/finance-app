@@ -80,7 +80,7 @@ export default function CategoryForm({ category, onClose }: CategoryFormProps) {
     } else {
       await db.categories.add({
         ...formData,
-        isActive: 1 as any,
+        isActive: true,
       });
     }
 
@@ -90,21 +90,21 @@ export default function CategoryForm({ category, onClose }: CategoryFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Category Name
         </label>
         <input
           type="text"
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
           placeholder="e.g., Groceries"
           required
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Type
         </label>
         <div className="flex gap-2">
@@ -134,13 +134,13 @@ export default function CategoryForm({ category, onClose }: CategoryFormProps) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Parent Category (optional)
         </label>
         <select
           value={formData.parentCategoryId || ''}
           onChange={(e) => setFormData({ ...formData, parentCategoryId: e.target.value ? parseInt(e.target.value) : null })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
         >
           <option value="">None (Top-level category)</option>
           {parentCategories.map(cat => (
@@ -174,7 +174,7 @@ export default function CategoryForm({ category, onClose }: CategoryFormProps) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Color
         </label>
         <div className="flex flex-wrap gap-2">
@@ -194,7 +194,7 @@ export default function CategoryForm({ category, onClose }: CategoryFormProps) {
 
       {formData.type === 'expense' && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Monthly Budget (optional)
           </label>
           <input
@@ -202,7 +202,7 @@ export default function CategoryForm({ category, onClose }: CategoryFormProps) {
             step="0.01"
             value={formData.monthlyBudget || ''}
             onChange={(e) => setFormData({ ...formData, monthlyBudget: parseFloat(e.target.value) || 0 })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
             placeholder="0.00"
           />
         </div>
@@ -212,7 +212,7 @@ export default function CategoryForm({ category, onClose }: CategoryFormProps) {
         <button
           type="button"
           onClick={onClose}
-          className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors dark:text-gray-200"
         >
           Cancel
         </button>

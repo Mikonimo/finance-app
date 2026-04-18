@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db, Transaction } from '../db/database';
+import { db, Transaction, isActive as isActiveCheck } from '../db/database';
 import { Plus, Edit2, Trash2, Calendar, ArrowLeftRight, Search, Filter, X } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { formatCurrency, formatDate } from '../utils/finance';
@@ -8,6 +8,7 @@ import { format } from 'date-fns';
 import Modal from './Modal';
 import TransactionForm from './TransactionsForm';
 import TransferForm from './TransferForm';
+import { PageSkeleton } from './LoadingSkeleton';
 
 export default function TransactionsView() {
   const [showModal, setShowModal] = useState(false);
@@ -27,7 +28,7 @@ export default function TransactionsView() {
   const transactions = useLiveQuery(
     async () => {
       const all = await db.transactions.orderBy('date').reverse().toArray();
-      return all.filter(t => t.isActive !== false);
+      return all.filter(t => isActiveCheck(t.isActive as any));
     },
     []
   );
@@ -43,7 +44,7 @@ export default function TransactionsView() {
   );
 
   if (!transactions || !categories || !accounts) {
-    return <div className="p-4">Loading...</div>;
+    return <PageSkeleton />;
   }
 
   const handleDelete = async (id: number) => {
@@ -63,13 +64,14 @@ export default function TransactionsView() {
   };
 
   // Get all unique tags from transactions
-  const allTags = Array.from(
-    new Set(transactions.flatMap(t => t.tags || []))
-  ).sort();
+  const allTags = useMemo(
+    () => Array.from(new Set(transactions.flatMap(t => t.tags || []))).sort(),
+    [transactions]
+  );
 
-  const filteredTransactions = transactions.filter(t => {
+  const filteredTransactions = useMemo(() => transactions.filter(t => {
     // Only show active transactions (not deleted)
-    if (t.isActive === false) return false;
+    if (!isActiveCheck(t.isActive as any)) return false;
 
     // Type filter
     if (filterType !== 'all' && t.type !== filterType) return false;
@@ -81,7 +83,7 @@ export default function TransactionsView() {
       const matchesPayee = t.payee?.toLowerCase().includes(query);
       const matchesNotes = t.notes?.toLowerCase().includes(query);
       const matchesTags = t.tags?.some(tag => tag.toLowerCase().includes(query));
-      
+
       if (!matchesDescription && !matchesPayee && !matchesNotes && !matchesTags) {
         return false;
       }
@@ -115,7 +117,7 @@ export default function TransactionsView() {
     }
 
     return true;
-  });
+  }), [transactions, filterType, searchQuery, selectedCategories, selectedAccounts, amountMin, amountMax, dateFrom, dateTo, selectedTags]);
 
   const activeFilterCount = [
     searchQuery,
@@ -140,15 +142,25 @@ export default function TransactionsView() {
     setFilterType('all');
   };
 
+  // Build lookup maps to avoid O(n) .find() per transaction in render
+  const categoryMap = useMemo(
+    () => new Map(categories.map(c => [c.id!, c])),
+    [categories]
+  );
+  const accountMap = useMemo(
+    () => new Map(accounts.map(a => [a.id!, a])),
+    [accounts]
+  );
+
   // Group transactions by month
-  const groupedTransactions = filteredTransactions.reduce((acc, t) => {
+  const groupedTransactions = useMemo(() => filteredTransactions.reduce((acc, t) => {
     const monthKey = format(t.date, 'MMMM yyyy');
     if (!acc[monthKey]) {
       acc[monthKey] = [];
     }
     acc[monthKey].push(t);
     return acc;
-  }, {} as Record<string, Transaction[]>);
+  }, {} as Record<string, Transaction[]>), [filteredTransactions]);
 
   return (
     <div className="max-w-7xl mx-auto p-4 space-y-6">
@@ -405,10 +417,10 @@ export default function TransactionsView() {
             </div>
             <div className="divide-y">
               {monthTransactions.map((transaction) => {
-                const category = categories.find(c => c.id === transaction.categoryId);
-                const account = accounts.find(a => a.id === transaction.accountId);
-                const toAccount = transaction.toAccountId 
-                  ? accounts.find(a => a.id === transaction.toAccountId)
+                const category = categoryMap.get(transaction.categoryId);
+                const account = accountMap.get(transaction.accountId);
+                const toAccount = transaction.toAccountId
+                  ? accountMap.get(transaction.toAccountId)
                   : null;
                 const Icon = category?.icon ? (LucideIcons as any)[category.icon] : null;
                 const isTransfer = transaction.type === 'transfer';

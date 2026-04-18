@@ -122,6 +122,26 @@ export class FinanceDB extends Dexie {
 
 export const db = new FinanceDB();
 
+// Helper to check isActive across both boolean and integer formats
+// This handles data that may have been synced from SQLite (integer 0/1)
+// or created locally (boolean true/false)
+export function isActive(value: boolean | number | undefined): boolean {
+  if (value === undefined) return true; // default to active
+  return value !== false && value !== 0;
+}
+
+// Reusable query helpers for active records
+export const activeQueries = {
+  accounts: () => db.accounts.filter(a => isActive(a.isActive as any)).toArray(),
+  categories: (type?: string) => {
+    if (type) {
+      return db.categories.where('type').equals(type).and(c => isActive(c.isActive as any)).toArray();
+    }
+    return db.categories.filter(c => isActive(c.isActive as any)).toArray();
+  },
+  transactions: () => db.transactions.filter(t => isActive(t.isActive as any)).toArray(),
+};
+
 // Seed initial data
 export async function seedInitialData() {
   const accountCount = await db.accounts.count();
@@ -130,23 +150,23 @@ export async function seedInitialData() {
     // Default categories
     const defaultCategories: Omit<Category, 'id'>[] = [
       // Income categories
-      { name: 'Salary', type: 'income', color: '#10b981', icon: 'Briefcase', isActive: 1 as any },
-      { name: 'Freelance', type: 'income', color: '#14b8a6', icon: 'Wallet', isActive: 1 as any },
-      { name: 'Investment', type: 'income', color: '#06b6d4', icon: 'TrendingUp', isActive: 1 as any },
-      { name: 'Other Income', type: 'income', color: '#0ea5e9', icon: 'CircleDollarSign', isActive: 1 as any },
+      { name: 'Salary', type: 'income', color: '#10b981', icon: 'Briefcase', isActive: true },
+      { name: 'Freelance', type: 'income', color: '#14b8a6', icon: 'Wallet', isActive: true },
+      { name: 'Investment', type: 'income', color: '#06b6d4', icon: 'TrendingUp', isActive: true },
+      { name: 'Other Income', type: 'income', color: '#0ea5e9', icon: 'CircleDollarSign', isActive: true },
 
       // Expense categories
-      { name: 'Groceries', type: 'expense', color: '#f59e0b', icon: 'ShoppingCart', isActive: 1 as any },
-      { name: 'Dining Out', type: 'expense', color: '#ef4444', icon: 'Utensils', isActive: 1 as any },
-      { name: 'Transportation', type: 'expense', color: '#8b5cf6', icon: 'Car', isActive: 1 as any },
-      { name: 'Utilities', type: 'expense', color: '#6366f1', icon: 'Zap', isActive: 1 as any },
-      { name: 'Rent/', type: 'expense', color: '#ec4899', icon: 'Home', isActive: 1 as any },
-      { name: 'Entertainment', type: 'expense', color: '#f43f5e', icon: 'Tv', isActive: 1 as any },
-      { name: 'Healthcare', type: 'expense', color: '#14b8a6', icon: 'Heart', isActive: 1 as any },
-      { name: 'Shopping', type: 'expense', color: '#a855f7', icon: 'ShoppingBag', isActive: 1 as any },
-      { name: 'Insurance', type: 'expense', color: '#3b82f6', icon: 'CreditCard', isActive: 1 as any },
-      { name: 'Education', type: 'expense', color: '#06b6d4', icon: 'GraduationCap', isActive: 1 as any },
-      { name: 'Other', type: 'expense', color: '#64748b', icon: 'Package', isActive: 1 as any },
+      { name: 'Groceries', type: 'expense', color: '#f59e0b', icon: 'ShoppingCart', isActive: true },
+      { name: 'Dining Out', type: 'expense', color: '#ef4444', icon: 'Utensils', isActive: true },
+      { name: 'Transportation', type: 'expense', color: '#8b5cf6', icon: 'Car', isActive: true },
+      { name: 'Utilities', type: 'expense', color: '#6366f1', icon: 'Zap', isActive: true },
+      { name: 'Rent/', type: 'expense', color: '#ec4899', icon: 'Home', isActive: true },
+      { name: 'Entertainment', type: 'expense', color: '#f43f5e', icon: 'Tv', isActive: true },
+      { name: 'Healthcare', type: 'expense', color: '#14b8a6', icon: 'Heart', isActive: true },
+      { name: 'Shopping', type: 'expense', color: '#a855f7', icon: 'ShoppingBag', isActive: true },
+      { name: 'Insurance', type: 'expense', color: '#3b82f6', icon: 'CreditCard', isActive: true },
+      { name: 'Education', type: 'expense', color: '#06b6d4', icon: 'GraduationCap', isActive: true },
+      { name: 'Other', type: 'expense', color: '#64748b', icon: 'Package', isActive: true },
     ];
 
     await db.categories.bulkAdd(defaultCategories);
@@ -158,7 +178,7 @@ export async function seedInitialData() {
       balance: 0,
       color: '#0ea5e9',
       createdAt: new Date(),
-      isActive: 1 as any
+      isActive: true
     });
   }
 }

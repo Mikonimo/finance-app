@@ -244,9 +244,7 @@ export default function SyncPanel() {
   // Full sync: Pull then Push
   const handleFullSync = async () => {
     await handlePullFromServer();
-    setTimeout(async () => {
-      await handlePushToServer();
-    }, 1000);
+    await handlePushToServer();
   };
 
   // Force full pull (ignore lastSyncTime)

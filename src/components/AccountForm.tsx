@@ -26,7 +26,7 @@ export default function AccountForm({ account, onClose }: AccountFormProps) {
       await db.accounts.add({
         ...formData,
         createdAt: new Date(),
-        isActive: 1 as any,
+        isActive: true,
       });
     }
 
@@ -36,21 +36,21 @@ export default function AccountForm({ account, onClose }: AccountFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Account Name
         </label>
         <input
           type="text"
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
           placeholder="e.g., Main Checking"
           required
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Initial Balance (Optional)
         </label>
         <input
@@ -58,20 +58,20 @@ export default function AccountForm({ account, onClose }: AccountFormProps) {
           step="0.01"
           value={formData.balance || ''}
           onChange={(e) => setFormData({ ...formData, balance: parseFloat(e.target.value) || 0 })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
           placeholder="0.00"
         />
         <p className="text-xs text-gray-500 mt-1">Enter the current balance of this account</p>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Account Type
         </label>
         <select
           value={formData.type}
           onChange={(e) => setFormData({ ...formData, type: e.target.value as Account['type'] })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
         >
           <option value="checking">Checking</option>
           <option value="savings">Savings</option>
@@ -82,7 +82,7 @@ export default function AccountForm({ account, onClose }: AccountFormProps) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Color
         </label>
         <div className="flex flex-wrap gap-2">
@@ -104,7 +104,7 @@ export default function AccountForm({ account, onClose }: AccountFormProps) {
         <button
           type="button"
           onClick={onClose}
-          className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors dark:text-gray-200"
         >
           Cancel
         </button>

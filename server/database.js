@@ -42,14 +42,6 @@ export function initDatabase() {
     )
   `);
 
-  // Add parentCategoryId column if it doesn't exist (migration)
-  try {
-    db.exec(`ALTER TABLE categories ADD COLUMN parentCategoryId INTEGER`);
-    console.log('✅ Added parentCategoryId column to categories table');
-  } catch (error) {
-    // Column already exists, ignore error
-  }
-
   // Transactions table
   db.exec(`
     CREATE TABLE IF NOT EXISTS transactions (
@@ -65,6 +57,7 @@ export function initDatabase() {
       tags TEXT,
       notes TEXT,
       createdAt TEXT NOT NULL,
+      isActive INTEGER DEFAULT 1,
       updatedAt TEXT DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (accountId) REFERENCES accounts(id),
       FOREIGN KEY (toAccountId) REFERENCES accounts(id),
@@ -72,40 +65,21 @@ export function initDatabase() {
     )
   `);
 
-  // Add missing columns to transactions if they don't exist (migrations)
-  try {
-    db.exec(`ALTER TABLE transactions ADD COLUMN toAccountId INTEGER`);
-    console.log('✅ Added toAccountId column to transactions table');
-  } catch (error) {
-    // Column already exists, ignore
-  }
-  
-  try {
-    db.exec(`ALTER TABLE transactions ADD COLUMN payee TEXT`);
-    console.log('✅ Added payee column to transactions table');
-  } catch (error) {
-    // Column already exists, ignore
-  }
-  
-  try {
-    db.exec(`ALTER TABLE transactions ADD COLUMN tags TEXT`);
-    console.log('✅ Added tags column to transactions table');
-  } catch (error) {
-    // Column already exists, ignore
-  }
-  
-  try {
-    db.exec(`ALTER TABLE transactions ADD COLUMN notes TEXT`);
-    console.log('✅ Added notes column to transactions table');
-  } catch (error) {
-    // Column already exists, ignore
-  }
-  
-  try {
-    db.exec(`ALTER TABLE transactions ADD COLUMN isActive INTEGER DEFAULT 1`);
-    console.log('✅ Added isActive column to transactions table');
-  } catch (error) {
-    // Column already exists, ignore
+  // Migrations: add columns if they don't exist
+  const migrations = [
+    { table: 'categories', column: 'parentCategoryId', type: 'INTEGER' },
+    { table: 'transactions', column: 'toAccountId', type: 'INTEGER' },
+    { table: 'transactions', column: 'payee', type: 'TEXT' },
+    { table: 'transactions', column: 'tags', type: 'TEXT' },
+    { table: 'transactions', column: 'notes', type: 'TEXT' },
+    { table: 'transactions', column: 'isActive', type: 'INTEGER DEFAULT 1' },
+  ];
+
+  for (const { table, column, type } of migrations) {
+    if (!columnExists(table, column)) {
+      db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${type}`);
+      console.log(`✅ Added ${column} column to ${table} table`);
+    }
   }
 
   // Budgets table
@@ -158,23 +132,49 @@ export function initDatabase() {
     )
   `);
 
+  // Create indexes for performance
+  db.exec(`CREATE INDEX IF NOT EXISTS idx_transactions_accountId ON transactions(accountId)`);
+  db.exec(`CREATE INDEX IF NOT EXISTS idx_transactions_categoryId ON transactions(categoryId)`);
+  db.exec(`CREATE INDEX IF NOT EXISTS idx_transactions_updatedAt ON transactions(updatedAt)`);
+  db.exec(`CREATE INDEX IF NOT EXISTS idx_transactions_date ON transactions(date)`);
+  db.exec(`CREATE INDEX IF NOT EXISTS idx_categories_parentCategoryId ON categories(parentCategoryId)`);
+  db.exec(`CREATE INDEX IF NOT EXISTS idx_budgets_categoryId ON budgets(categoryId)`);
+  db.exec(`CREATE INDEX IF NOT EXISTS idx_recurring_updatedAt ON recurring_transactions(updatedAt)`);
+  db.exec(`CREATE INDEX IF NOT EXISTS idx_networth_date ON networth_snapshots(date)`);
+
   console.log('✅ Database initialized successfully');
+}
+
+// Allowed table names to prevent SQL injection
+const ALLOWED_TABLES = ['accounts', 'categories', 'transactions', 'budgets', 'recurring_transactions', 'networth_snapshots'];
+
+function validateTable(table) {
+  if (!ALLOWED_TABLES.includes(table)) {
+    throw new Error(`Invalid table name: ${table}`);
+  }
+  return table;
+}
+
+// Helper to check if a column exists before running ALTER TABLE
+function columnExists(table, column) {
+  const columns = db.prepare(`PRAGMA table_info(${validateTable(table)})`).all();
+  return columns.some(col => col.name === column);
 }
 
 // Generic CRUD operations
 export const queries = {
   // Get all records from a table
-  getAll: (table) => db.prepare(`SELECT * FROM ${table}`).all(),
-  
+  getAll: (table) => db.prepare(`SELECT * FROM ${validateTable(table)}`).all(),
+
   // Get a single record by ID
-  getById: (table, id) => db.prepare(`SELECT * FROM ${table} WHERE id = ?`).get(id),
-  
+  getById: (table, id) => db.prepare(`SELECT * FROM ${validateTable(table)} WHERE id = ?`).get(id),
+
   // Insert a new record
   insert: (table, data) => {
     const keys = Object.keys(data);
     const values = Object.values(data);
     const placeholders = keys.map(() => '?').join(', ');
-    const sql = `INSERT INTO ${table} (${keys.join(', ')}) VALUES (${placeholders})`;
+    const sql = `INSERT INTO ${validateTable(table)} (${keys.join(', ')}) VALUES (${placeholders})`;
     const result = db.prepare(sql).run(...values);
     return result.lastInsertRowid;
   },
@@ -184,14 +184,14 @@ export const queries = {
     const keys = Object.keys(data);
     const values = Object.values(data);
     const setClause = keys.map(key => `${key} = ?`).join(', ');
-    const sql = `UPDATE ${table} SET ${setClause}, updatedAt = CURRENT_TIMESTAMP WHERE id = ?`;
+    const sql = `UPDATE ${validateTable(table)} SET ${setClause}, updatedAt = CURRENT_TIMESTAMP WHERE id = ?`;
     const result = db.prepare(sql).run(...values, id);
     return result.changes;
   },
   
   // Delete a record
   delete: (table, id) => {
-    const result = db.prepare(`DELETE FROM ${table} WHERE id = ?`).run(id);
+    const result = db.prepare(`DELETE FROM ${validateTable(table)} WHERE id = ?`).run(id);
     return result.changes;
   },
   

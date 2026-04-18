@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../db/database';
+import { db, isActive } from '../db/database';
 import { useAppStore } from '../store/appStore';
 import {
   formatCurrency,
@@ -10,6 +10,7 @@ import {
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { TrendingUp, TrendingDown, DollarSign, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
+import { DashboardSkeleton } from './LoadingSkeleton';
 import { format, subMonths, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, isWithinInterval } from 'date-fns';
 
 type DateRangePreset = 'week' | 'month' | '3months' | '6months' | 'year' | 'custom';
@@ -21,26 +22,26 @@ export default function Dashboard() {
   const [customEndDate, setCustomEndDate] = useState(format(endOfMonth(new Date()), 'yyyy-MM-dd'));
 
   const transactions = useLiveQuery(
-    () => db.transactions.filter(t => t.isActive !== false && (t.isActive as any) !== 0).toArray(),
+    () => db.transactions.filter(t => isActive(t.isActive as any)).toArray(),
     []
   );
 
   const categories = useLiveQuery(
-    () => db.categories.filter(c => c.isActive === true || (c.isActive as any) === 1).toArray(),
+    () => db.categories.filter(c => isActive(c.isActive as any)).toArray(),
     []
   );
 
   const accounts = useLiveQuery(
-    () => db.accounts.filter(a => a.isActive === true || (a.isActive as any) === 1).toArray(),
+    () => db.accounts.filter(a => isActive(a.isActive as any)).toArray(),
     []
   );
 
   if (!transactions || !categories || !accounts) {
-    return <div className="p-4">Loading...</div>;
+    return <DashboardSkeleton />;
   }
 
   // Calculate date range based on preset
-  const getDateRange = () => {
+  const dateRange = useMemo(() => {
     const now = new Date();
     switch (dateRangePreset) {
       case 'week':
@@ -58,38 +59,54 @@ export default function Dashboard() {
       default:
         return { start: startOfMonth(now), end: endOfMonth(now) };
     }
-  };
+  }, [dateRangePreset, selectedMonth, customStartDate, customEndDate]);
 
-  const dateRange = getDateRange();
-  const monthTransactions = transactions.filter(t =>
-    isWithinInterval(t.date, { start: dateRange.start, end: dateRange.end })
+  const monthTransactions = useMemo(
+    () => transactions.filter(t =>
+      isWithinInterval(t.date, { start: dateRange.start, end: dateRange.end })
+    ),
+    [transactions, dateRange]
   );
-  const income = calculateTotal(monthTransactions, 'income');
-  const expenses = calculateTotal(monthTransactions, 'expense');
+
+  const income = useMemo(() => calculateTotal(monthTransactions, 'income'), [monthTransactions]);
+  const expenses = useMemo(() => calculateTotal(monthTransactions, 'expense'), [monthTransactions]);
   const netCashFlow = income - expenses;
 
-  const expensesByCategory = groupTransactionsByCategory(
-    monthTransactions.filter(t => t.type === 'expense')
-  );
+  const chartData = useMemo(() => {
+    const expensesByCategory = groupTransactionsByCategory(
+      monthTransactions.filter(t => t.type === 'expense')
+    );
+    return Object.entries(expensesByCategory).map(([catId, amount]) => {
+      const category = categories.find(c => c.id === Number(catId));
+      return {
+        name: category?.name || 'Unknown',
+        value: amount,
+        color: category?.color || '#64748b',
+        icon: category?.icon
+      };
+    }).sort((a, b) => b.value - a.value);
+  }, [monthTransactions, categories]);
 
-  const chartData = Object.entries(expensesByCategory).map(([catId, amount]) => {
-    const category = categories.find(c => c.id === Number(catId));
-    return {
-      name: category?.name || 'Unknown',
-      value: amount,
-      color: category?.color || '#64748b',
-      icon: category?.icon
-    };
-  }).sort((a, b) => b.value - a.value);
-
-  const totalBalance = accounts.reduce((sum, acc) => {
-    const accTransactions = transactions.filter(t => t.accountId === acc.id);
-    const transactionBalance = accTransactions.reduce((bal, t) => {
-      return t.type === 'income' ? bal + t.amount : bal - t.amount;
+  const totalBalance = useMemo(() => {
+    // Build a map of account balances from transactions to avoid O(n²)
+    const balanceByAccount = new Map<number, number>();
+    for (const t of transactions) {
+      const current = balanceByAccount.get(t.accountId) || 0;
+      balanceByAccount.set(
+        t.accountId,
+        t.type === 'income' ? current + t.amount : current - t.amount
+      );
+    }
+    return accounts.reduce((sum, acc) => {
+      return sum + (acc.balance || 0) + (balanceByAccount.get(acc.id!) || 0);
     }, 0);
-    // Add initial balance to transaction balance
-    return sum + (acc.balance || 0) + transactionBalance;
-  }, 0);
+  }, [transactions, accounts]);
+
+  // Build category lookup map to avoid O(n) .find() per transaction in render
+  const categoryMap = useMemo(
+    () => new Map(categories.map(c => [c.id!, c])),
+    [categories]
+  );
 
   // Format display text for current period
   const getPeriodDisplayText = () => {
@@ -333,7 +350,7 @@ export default function Dashboard() {
         ) : (
           <div className="space-y-3">
             {monthTransactions.slice(0, 5).map((transaction) => {
-              const category = categories.find(c => c.id === transaction.categoryId);
+              const category = categoryMap.get(transaction.categoryId);
               const Icon = category?.icon ? (LucideIcons as any)[category.icon] : null;
               return (
                 <div key={transaction.id} className="flex justify-between items-center py-2 border-b last:border-0">

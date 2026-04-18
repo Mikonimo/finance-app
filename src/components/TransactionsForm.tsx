@@ -42,6 +42,19 @@ export default function TransactionForm({ transaction, onClose }: TransactionFor
     []
   );
 
+  // Set default account and category if not set
+  useEffect(() => {
+    if (formData.accountId === 0 && accounts && accounts.length > 0) {
+      setFormData(prev => ({ ...prev, accountId: accounts[0].id! }));
+    }
+  }, [accounts, formData.accountId]);
+
+  useEffect(() => {
+    if (formData.categoryId === 0 && categories && categories.length > 0) {
+      setFormData(prev => ({ ...prev, categoryId: categories[0].id! }));
+    }
+  }, [categories, formData.categoryId]);
+
   if (!accounts || !categories) {
     return <div>Loading...</div>;
   }
@@ -60,7 +73,7 @@ export default function TransactionForm({ transaction, onClose }: TransactionFor
   const handlePayeeChange = (value: string) => {
     setFormData({ ...formData, payee: value });
     if (value.length > 0) {
-      const filtered = uniquePayees.filter(p => 
+      const filtered = uniquePayees.filter(p =>
         p && p.toLowerCase().includes(value.toLowerCase())
       ) as string[];
       setPayeeSuggestions(filtered);
@@ -73,7 +86,7 @@ export default function TransactionForm({ transaction, onClose }: TransactionFor
   const handleTagInput = (value: string) => {
     setTagInput(value);
     if (value.length > 0) {
-      const filtered = uniqueTags.filter(tag => 
+      const filtered = uniqueTags.filter(tag =>
         tag.toLowerCase().includes(value.toLowerCase()) &&
         !formData.tags.includes(tag)
       );
@@ -93,9 +106,9 @@ export default function TransactionForm({ transaction, onClose }: TransactionFor
   };
 
   const removeTag = (tagToRemove: string) => {
-    setFormData({ 
-      ...formData, 
-      tags: formData.tags.filter(tag => tag !== tagToRemove) 
+    setFormData({
+      ...formData,
+      tags: formData.tags.filter(tag => tag !== tagToRemove)
     });
   };
 
@@ -113,19 +126,6 @@ export default function TransactionForm({ transaction, onClose }: TransactionFor
   const getSubcategories = (parentId: number) => {
     return categories.filter(c => c.parentCategoryId === parentId);
   };
-
-  // Set default account and category if not set
-  useEffect(() => {
-    if (formData.accountId === 0 && accounts && accounts.length > 0) {
-      setFormData(prev => ({ ...prev, accountId: accounts[0].id! }));
-    }
-  }, [accounts, formData.accountId]);
-
-  useEffect(() => {
-    if (formData.categoryId === 0 && categories && categories.length > 0) {
-      setFormData(prev => ({ ...prev, categoryId: categories[0].id! }));
-    }
-  }, [categories, formData.categoryId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

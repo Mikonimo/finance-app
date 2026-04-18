@@ -33,10 +33,6 @@ export default function RecurringTransactionForm({ recurringTransaction, onSucce
     [formData.type]
   );
 
-  if (!accounts || !categories) {
-    return <div>Loading...</div>;
-  }
-
   // Set default account and category if not set
   useEffect(() => {
     if (formData.accountId === 0 && accounts && accounts.length > 0) {
@@ -49,6 +45,10 @@ export default function RecurringTransactionForm({ recurringTransaction, onSucce
       setFormData(prev => ({ ...prev, categoryId: categories[0].id! }));
     }
   }, [categories, formData.categoryId]);
+
+  if (!accounts || !categories) {
+    return <div>Loading...</div>;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

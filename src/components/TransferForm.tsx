@@ -23,10 +23,6 @@ export default function TransferForm({ onClose }: TransferFormProps) {
     []
   );
 
-  if (!accounts) {
-    return <div>Loading...</div>;
-  }
-
   // Set default accounts if not set
   useEffect(() => {
     if (formData.fromAccountId === 0 && accounts && accounts.length > 0) {
@@ -39,6 +35,10 @@ export default function TransferForm({ onClose }: TransferFormProps) {
       setFormData(prev => ({ ...prev, toAccountId: accounts[1].id! }));
     }
   }, [accounts, formData.toAccountId]);
+
+  if (!accounts) {
+    return <div>Loading...</div>;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
